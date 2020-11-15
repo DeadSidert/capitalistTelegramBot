@@ -2,6 +2,7 @@ package com.capitalist.telegramBot.service;
 
 import com.capitalist.telegramBot.model.Company;
 import com.capitalist.telegramBot.repo.JpaCompanyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ public class CompanyService {
 
     private JpaCompanyRepository companyRepository;
 
+    @Autowired
     public CompanyService(JpaCompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
     }
@@ -24,7 +26,7 @@ public class CompanyService {
     }
 
     public Company getOrCreate(int id){
-        return get(id).orElseGet(() -> companyRepository.save(new Company(id)));
+        return get(id).orElseGet(() -> companyRepository.save(new Company()));
     }
 
     public Optional<Company> get(int id){
@@ -33,5 +35,9 @@ public class CompanyService {
 
     public List<Company> getCompanies(){
         return companyRepository.findAll();
+    }
+
+    public void delete(int id){
+        companyRepository.deleteById(id);
     }
 }

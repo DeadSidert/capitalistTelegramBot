@@ -4,24 +4,24 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
 public class Company {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int companyId;
     private String type;
+    private int oil;
+    private int electric;
 
-    public Company(int companyId) {
-        this.companyId = companyId;
+    public Company() {
         this.type = "";
+        this.oil = 0;
+        this.electric = 0;
     }
 }

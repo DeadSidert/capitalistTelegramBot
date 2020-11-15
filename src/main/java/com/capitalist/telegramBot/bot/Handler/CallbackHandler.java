@@ -1,14 +1,22 @@
 package com.capitalist.telegramBot.bot.Handler;
 
 import com.capitalist.telegramBot.bot.builder.MessageBuilder;
+import com.capitalist.telegramBot.gameEntities.Market;
+import com.capitalist.telegramBot.model.Company;
+import com.capitalist.telegramBot.model.User;
 import com.capitalist.telegramBot.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -16,6 +24,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class CallbackHandler {
 
     private UserService userService;
+    private final Market market;
+    private List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+    private List<InlineKeyboardButton> row = null;
 
     @Value("${bot.name}")
     private String botName;
@@ -33,11 +44,13 @@ public class CallbackHandler {
     private String adminUsername;
 
     @Autowired
-    public CallbackHandler(UserService userService) {
+    public CallbackHandler(UserService userService, Market market) {
         this.userService = userService;
+        this.market = market;
     }
 
-    public CallbackHandler() {
+    public CallbackHandler(Market market) {
+        this.market = market;
     }
 
     public SendMessage actionAndRef(Update update){
@@ -103,4 +116,31 @@ public class CallbackHandler {
 
         return messageBuilder.build();
     }
+
+    public AnswerCallbackQuery creatAlertCallbackOil(Update update){
+        String id = update.getCallbackQuery().getId();
+        int oil = market.getUserCompany((update.getCallbackQuery().getFrom().getId())).getOil();
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery
+                .setCallbackQueryId(id)
+                .setShowAlert(true)
+                .setText("\uD83D\uDEAB Минимум для продажи 500 \uD83D\uDEE2 \n" +
+                        "баррелей нефти, а у вас только " + oil + "\n" +
+                        "баррелей нефти");
+        return answerCallbackQuery;
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackElectric(Update update){
+        String id = update.getCallbackQuery().getId();
+        int electric = market.getUserCompany((update.getCallbackQuery().getFrom().getId())).getElectric();
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery
+                .setCallbackQueryId(id)
+                .setShowAlert(true)
+                .setText("\uD83D\uDEAB Минимум для продажи 500 \uD83D\uDD0B" +
+                        "килловатт энергии, а у вас только " + electric + "\n" +
+                        "килловатт энергии");
+        return answerCallbackQuery;
+    }
+
 }

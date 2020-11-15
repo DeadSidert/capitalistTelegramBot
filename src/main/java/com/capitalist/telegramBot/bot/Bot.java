@@ -60,7 +60,7 @@ public class Bot extends TelegramLongPollingBot {
 
     public void fabricTextTelegram(Update update){
         SendMessage sendMessage;
-        String command = TelegramUtil.extractCommand(update.getMessage().getText());
+        String command = update.getMessage().getText();
         User user = userService.getOrCreate(update.getMessage().getFrom().getId());
 
         // старт
@@ -103,6 +103,24 @@ public class Bot extends TelegramLongPollingBot {
         else if ("\uD83D\uDCF0".equalsIgnoreCase(command)){
             mainMenu(update);
         }
+        // нажатие на Банк в меню
+        if ("\uD83C\uDFE6 Банк".equalsIgnoreCase(command)){
+           sendMessage = updateReceiver.pay(update);
+           executeWithExceptionCheck(sendMessage);
+        }
+        // нажатие на Моя компания в меню
+        if ("\uD83C\uDFED Моя компания".equalsIgnoreCase(command)){
+            sendMessage = updateReceiver.mainCompany(update);
+            executeWithExceptionCheck(sendMessage);
+        }
+        if ("⬅️ Назад".equalsIgnoreCase(command)){
+            mainMenu(update);
+        }
+
+        if ("\uD83D\uDED2 Рынок".equalsIgnoreCase(command)){
+            sendMessage = updateReceiver.mainMarket(update);
+            executeWithExceptionCheck(sendMessage);
+        }
 
     }
     public void fabricCallbackTelegram(Update update){
@@ -120,6 +138,28 @@ public class Bot extends TelegramLongPollingBot {
         if ("/advert".equalsIgnoreCase(callbackQuery.getData())){
             executeWithExceptionCheck(updateReceiver.advert(update));
         }
+        // продажа нефти на рынке
+        if ("/sell_oil".equalsIgnoreCase(callbackQuery.getData())){
+            if (!updateReceiver.marketEnough(update.getCallbackQuery().getFrom().getId(), "oil")){
+                try {
+                    execute(updateReceiver.alertOil(update));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        // продажа энергии на рынке
+        if ("/sell_electric".equalsIgnoreCase(callbackQuery.getData())){
+            if (!updateReceiver.marketEnough(update.getCallbackQuery().getFrom().getId(), "electric")){
+                try {
+                    execute(updateReceiver.alertElectric(update));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
     }
 
     public void mainMenu(Update update){
