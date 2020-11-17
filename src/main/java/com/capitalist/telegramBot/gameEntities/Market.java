@@ -25,6 +25,7 @@ public class Market {
     public SendMessage mark(Update update){
         int userId = update.getMessage().getFrom().getId();
         Company company = getUserCompany(userId);
+
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         messageBuilder
                 .line()
@@ -49,10 +50,117 @@ public class Market {
         return messageBuilder.build();
     }
 
-    public Company getUserCompany(int id){
-        User user = userService.getOrCreate(id);
-        return companyService.getOrCreate(user.getCompanyId());
+    public SendMessage sellOil(Update update) {
+        int userId = update.getCallbackQuery().getFrom().getId();
+        Company company = getUserCompany(userId);
+        User user = userService.getOrCreate(userId);
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+
+        user.setPositions("sell_oil");
+        userService.update(user);
+
+        return messageBuilder
+                .line("Введите кол-во \uD83D\uDEE2 баррелей нефти для продажи")
+                .build();
     }
+     // ввести кол-во нефти для продажи
+    public SendMessage sellOilImpl(Update update) {
+        int userId = update.getMessage().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        int quantity = 0;
+        int gold = 0;
+        int oilCoin = 0;
+
+        try {
+            quantity = Integer.parseInt(update.getMessage().getText());
+        }
+        catch (Exception e){
+            return messageBuilder
+                    .line("Вы ввели не число")
+                    .build();
+        }
+
+        Company company = getUserCompany(userId);
+        User user = userService.getOrCreate(userId);
+
+        if (company.getOil() < quantity){
+            return messageBuilder
+                    .line("Недостаточно нефти на складе!")
+                    .build();
+        }
+
+        gold = quantity / 500;
+        oilCoin = quantity / 250;
+        company.setOil(company.getOil() - quantity);
+        companyService.update(company);
+
+        user.setPositions("back");
+        user.setGold(user.getGold() + gold);
+        user.setOilCoin(user.getOilCoin() + oilCoin);
+        userService.update(user);
+
+        return messageBuilder
+                .line("Вы продали " + " \uD83D\uDEE2 баррелей нефти\n")
+                .line("Получили: " + gold + "\uD83D\uDCB0 Gold и " + oilCoin + " \uD83C\uDF11 OilCoin.")
+                .build();
+    }
+
+    public SendMessage sellElectric(Update update) {
+        int userId = update.getCallbackQuery().getFrom().getId();
+        Company company = getUserCompany(userId);
+        User user = userService.getOrCreate(userId);
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+
+        user.setPositions("sell_electric");
+        userService.update(user);
+
+        return messageBuilder
+                .line("Введите кол-во \uD83D\uDD0B киловатт энергии")
+                .build();
+    }
+
+    // ввести кол-во энергии для продажи
+    public SendMessage sellElectricImpl(Update update) {
+        int userId = update.getMessage().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        int quantity = 0;
+        int eCrypt = 0;
+        int eCoin = 0;
+
+        try {
+            quantity = Integer.parseInt(update.getMessage().getText());
+        }
+        catch (Exception e){
+            return messageBuilder
+                    .line("Вы ввели не число")
+                    .build();
+        }
+
+        Company company = getUserCompany(userId);
+        User user = userService.getOrCreate(userId);
+
+        if (company.getElectric() < quantity){
+            return messageBuilder
+                    .line("Недостаточно энергии на складе!")
+                    .build();
+        }
+
+        eCrypt = quantity / 500;
+        eCoin = quantity / 250;
+        company.setElectric(company.getElectric() - quantity);
+        companyService.update(company);
+
+        user.setECrypt(user.getECrypt() + eCrypt);
+        user.setECoin(user.getECoin() + eCoin);
+        user.setPositions("back");
+        userService.update(user);
+
+        return messageBuilder
+                .line("Вы продали " + " \uD83D\uDD0B киловатт энергии\n")
+                .line("Получили: " + eCrypt + "⚡️ ECrypt и " + eCoin + " \uD83C\uDF15 ECoin.")
+                .build();
+    }
+
 
     public boolean enoughOil(int id){
         Company company = getUserCompany(id);
@@ -63,4 +171,11 @@ public class Market {
         Company company = getUserCompany(id);
         return company.getElectric() >=500;
     }
+
+    public Company getUserCompany(int id){
+        User user = userService.getOrCreate(id);
+        return companyService.getOrCreate(user.getCompanyId());
+    }
+
+
 }

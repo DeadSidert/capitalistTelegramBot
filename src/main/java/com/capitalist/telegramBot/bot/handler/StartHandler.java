@@ -1,4 +1,4 @@
-package com.capitalist.telegramBot.bot.Handler;
+package com.capitalist.telegramBot.bot.handler;
 
 
 import com.capitalist.telegramBot.bot.builder.MessageBuilder;
@@ -45,6 +45,33 @@ public class StartHandler {
         replyKeyboardMarkup.setOneTimeKeyboard(true);
 
         String userId = String.valueOf(update.getMessage().getFrom().getId());
+        MessageBuilder messageBuilder = MessageBuilder.create(userId);
+        messageBuilder
+                .line()
+                .line("Добро пожаловать в \uD83D\uDD30CapitalistGame\uD83D\uDD30\n" +
+                        "\n" +
+                        "В этой игре Вы можете раскрыть свой потенциал бизнесмена.\n" +
+                        "\n" +
+                        "Создайте свою компанию \uD83C\uDFED\n" +
+                        "Покупайте фабрики ⛽️\uD83D\uDD0C\n" +
+                        "Торгуйте  акциями на бирже \uD83D\uDCC8\n" +
+                        "Производите ресурсы и торгуй ими \uD83D\uDCE6\n" +
+                        "Развивайтесь и станьте лучшим\n" +
+                        " \n" +
+                        "Давайте не будем тянуть время, а сразу же перейдем к обучению! " +
+                        "Нажмите \uD83D\uDDDE, чтобы перейти к обучению или \uD83D\uDCF0, чтобы пропустить его");
+        createStartMenu();
+
+        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+    }
+
+    public SendMessage callbackStart(Update update) {
+
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+        String userId = String.valueOf(update.getCallbackQuery().getFrom().getId());
         MessageBuilder messageBuilder = MessageBuilder.create(userId);
         messageBuilder
                 .line()
@@ -233,6 +260,11 @@ public class StartHandler {
                 .line()
                 .line("Вижу, что Вы устали читать столько текста. Давайте приступим к самой игре! Внизу Вы видите меню с кнопками. Нажмите на кнопку " +
                         "\uD83C\uDFED Моя компания и потом откройте \uD83D\uDCDC  Задания, чтобы узнать текущее задание и перейти к его выполнению!");
+
+        User user = userService.getOrCreate(userId);
+        user.setPositions("back");
+        userService.update(user);
+
         return messageBuilder.build();
     }
 
@@ -248,7 +280,7 @@ public class StartHandler {
         keyboardRow1.add("\uD83C\uDFE6 Банк");
 
         KeyboardRow keyboardRow2 = new KeyboardRow();
-        keyboardRow2.add("\uD83C\uDFB2 Игры");
+        keyboardRow2.add("\uD83C\uDF81 Ежедневный бонус");
         keyboardRow2.add("\uD83D\uDCA1 Дополнительно");
 
         rows.add(keyboardRow);

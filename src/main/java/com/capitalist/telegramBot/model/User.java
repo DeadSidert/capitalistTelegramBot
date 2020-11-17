@@ -6,6 +6,9 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 
 @Entity
@@ -21,18 +24,25 @@ public class User {
     private Integer gold;
     private Integer eCoin;
     private Integer eCrypt;
-    private Integer roubles;
     private Integer companyId;
+    private Integer referId;
+    private String regDate;
+    private Integer taskCompleted;
+    private String qiwi;
+    private Boolean dailyBonus;
 
     @Column(name = "references_url")
     private String referencesUrl;
+    @Column(name = "user_role")
     private String role;
     private String positions;
 
     @Column(name = "balls_1")
+    // желтые
     private double ballsOne;
 
     @Column(name = "balls_2")
+    // синие
     private double ballsTwo;
 
     public User(int userId) {
@@ -41,12 +51,16 @@ public class User {
         this.gold = 0;
         this.eCoin = 0;
         this.eCrypt = 0;
-        this.roubles = 0;
         this.referencesUrl = "";
+        this.referId = 0;
         this.role = "user";
         this.positions = "back";
         this.ballsOne = 0.000;
         this.ballsTwo = 0.000;
         this.companyId = 0;
+        this.taskCompleted = 0;
+        this.regDate = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
+        this.qiwi = "";
+        this.dailyBonus = false;
     }
 }

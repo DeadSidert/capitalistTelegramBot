@@ -1,9 +1,7 @@
-package com.capitalist.telegramBot.bot.Handler;
+package com.capitalist.telegramBot.bot.handler;
 
 import com.capitalist.telegramBot.bot.builder.MessageBuilder;
 import com.capitalist.telegramBot.gameEntities.Market;
-import com.capitalist.telegramBot.model.Company;
-import com.capitalist.telegramBot.model.User;
 import com.capitalist.telegramBot.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +27,7 @@ public class CallbackHandler {
     private final Market market;
     private List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
     private List<InlineKeyboardButton> row = null;
+    private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
 
     @Value("${bot.name}")
     private String botName;
@@ -141,6 +142,100 @@ public class CallbackHandler {
                         "килловатт энергии, а у вас только " + electric + "\n" +
                         "килловатт энергии");
         return answerCallbackQuery;
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackOilNotMoney(Update update){
+        String id = update.getCallbackQuery().getId();
+        int userId = update.getCallbackQuery().getFrom().getId();
+        int money = userService.getOrCreate(userId).getOilCoin();
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery
+                .setCallbackQueryId(id)
+                .setShowAlert(true)
+                .setText("\uD83D\uDEAB У вас не хватает \uD83C\uDF11 OilCoin для" +
+                        "\nпокупки этого насоса! Ваш баланс: " + money +"\n" +
+                        "OilCoin");
+        return answerCallbackQuery;
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackElectricNotMoney(Update update){
+        String id = update.getCallbackQuery().getId();
+        int userId = update.getCallbackQuery().getFrom().getId();
+        int money = userService.getOrCreate(userId).getECoin();
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery
+                .setCallbackQueryId(id)
+                .setShowAlert(true)
+                .setText("\uD83D\uDEAB У вас не хватает \uD83C\uDF15 ECoin для" +
+                        "\nпокупки этого насоса! Ваш баланс: " + money +"\n" +
+                        "ECoin");
+        return answerCallbackQuery;
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackReturnTrain(Update update){
+        String id = update.getCallbackQuery().getId();
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery
+                .setCallbackQueryId(id)
+                .setShowAlert(true)
+                .setText("Обучение началось!");
+        return answerCallbackQuery;
+    }
+
+    public SendMessage main(Update update){
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+        int userId = update.getCallbackQuery().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        messageBuilder
+                .line()
+                .line("\uD83D\uDCDC Доска объявлений")
+                .row()
+                .button("\uD83D\uDCAC Игровой ЧАТ", "/chat")
+                .row()
+                .button("Акционер \uD83E\uDD1D Реферал", "/action")
+                .row()
+                .button("\uD83D\uDCC6 РЕКЛАМА В БОТЕ", "/advert");
+
+        return messageBuilder.build();
+    }
+
+    public SendMessage mainMenu(Update update){
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+
+        int userId = update.getCallbackQuery().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        messageBuilder
+                .line()
+                .line("\uD83D\uDCC3 Главное меню");
+
+        createMenuMain();
+        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+    }
+
+    public void createMenuMain(){
+        ArrayList<KeyboardRow> rows = new ArrayList<>();
+        KeyboardRow keyboardRow = new KeyboardRow();
+
+        keyboardRow.add("\uD83C\uDFED Моя компания");
+        keyboardRow.add("\uD83C\uDFEB Биржа");
+
+        KeyboardRow keyboardRow1 = new KeyboardRow();
+        keyboardRow1.add("\uD83D\uDED2 Рынок");
+        keyboardRow1.add("\uD83C\uDFE6 Банк");
+
+        KeyboardRow keyboardRow2 = new KeyboardRow();
+        keyboardRow2.add("\uD83C\uDF81 Ежедневный бонус");
+        keyboardRow2.add("\uD83D\uDCA1 Дополнительно");
+
+        rows.add(keyboardRow);
+        rows.add(keyboardRow1);
+        rows.add(keyboardRow2);
+        replyKeyboardMarkup.setKeyboard(rows);
     }
 
 }

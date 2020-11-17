@@ -1,10 +1,8 @@
 package com.capitalist.telegramBot.bot;
 
-import com.capitalist.telegramBot.bot.Handler.CallbackHandler;
-import com.capitalist.telegramBot.bot.Handler.StartHandler;
-import com.capitalist.telegramBot.gameEntities.Bank;
-import com.capitalist.telegramBot.gameEntities.Market;
-import com.capitalist.telegramBot.gameEntities.MyCompany;
+import com.capitalist.telegramBot.bot.handler.CallbackHandler;
+import com.capitalist.telegramBot.bot.handler.StartHandler;
+import com.capitalist.telegramBot.gameEntities.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.List;
 
 
 @Component
@@ -24,19 +24,34 @@ public class UpdateReceiver {
     private final Bank bank;
     private final MyCompany myCompany;
     private final Market market;
+    private final Addition addition;
+    private final Games games;
 
     @Autowired
-    public UpdateReceiver(StartHandler startHandler, CallbackHandler callbackHandler, Bank bank, MyCompany myCompany, Market market) {
+    public UpdateReceiver(StartHandler startHandler, CallbackHandler callbackHandler, Bank bank, MyCompany myCompany, Market market, Addition addition, Games games) {
         this.startHandler = startHandler;
         this.callbackHandler = callbackHandler;
         this.bank = bank;
         this.myCompany = myCompany;
         this.market = market;
+        this.addition = addition;
+        this.games = games;
     }
 
+    public SendMessage mainMenu(Update update){
+        return callbackHandler.mainMenu(update);
+    }
+
+    public SendMessage main(Update update){
+        return callbackHandler.main(update);
+    }
 
     public SendMessage start(Update update){
         return startHandler.start(update);
+    }
+
+    public SendMessage callbackStart(Update update){
+        return startHandler.callbackStart(update);
     }
 
     public SendMessage startTwo(Update update){
@@ -103,6 +118,210 @@ public class UpdateReceiver {
         return callbackHandler.creatAlertCallbackElectric(update);
     }
 
+    public SendMessage oilPump(Update update){
+        return myCompany.oilPump(update);
+    }
 
+    public SendMessage electric(Update update){
+        return myCompany.electric(update);
+    }
+
+    public List<SendMessage> buyOilPump(Update update){
+        return myCompany.buyOilPump(update);
+    }
+
+    public List<SendMessage> buyElectric(Update update){
+        return myCompany.buyElectric(update);
+    }
+
+    public SendMessage buyOilPumpImpl(Update update, int level){
+        return myCompany.buyOilPumpImpl(update, level);
+    }
+
+    public SendMessage buyElectricImpl(Update update, int level){
+        return myCompany.buyElectricImpl(update, level);
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackOilNotMoney(Update update){
+        return callbackHandler.creatAlertCallbackOilNotMoney(update);
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackReturnTrain(Update update){
+        return callbackHandler.creatAlertCallbackReturnTrain(update);
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackElectricNotMoney(Update update){
+        return callbackHandler.creatAlertCallbackElectricNotMoney(update);
+    }
+
+    public SendMessage buyElectricOptom(Update update, int level){
+        return myCompany.buyElectricOptom(update, level);
+    }
+
+    public SendMessage buyOilPumpOptom(Update update, int level){
+        return myCompany.buyOilPumpOptom(update, level);
+    }
+
+    public SendMessage buyElectricOptomImpl(Update update, int level, int quantity){
+        return myCompany.buyElectricOptomImpl(update, level, quantity);
+    }
+
+    public SendMessage buyOilPumpOptomImpl(Update update, int level, int quantity){
+        return myCompany.buyOilPumpOptomImpl(update, level, quantity);
+    }
+
+    public SendMessage stat(Update update){
+        return myCompany.stat(update);
+    }
+
+    public List<SendMessage> referals(Update update){
+        return myCompany.referals(update);
+    }
+
+    public SendMessage changeBalls(Update update){
+        return bank.changeBalls(update);
+    }
+
+    public SendMessage changeGold(Update update){
+        return bank.changeGold(update);
+    }
+
+    public SendMessage changeEcrypt(Update update){
+        return bank.changeEcrypt(update);
+    }
+
+    public SendMessage change(Update update){
+        return bank.change(update);
+    }
+
+    public SendMessage paymentECoin(Update update) {
+        return bank.paymentECoin(update);
+    }
+
+    public SendMessage paymentOilCoin(Update update) {
+        return bank.paymentOilCoin(update);
+    }
+
+    public SendMessage payment(Update update) {
+        return bank.payment(update);
+    }
+
+    public SendMessage withdraw(Update update){
+        return bank.withdraw(update);
+    }
+
+    public SendMessage withdrawGold(Update update){
+        return bank.withdrawGold(update);
+    }
+
+    public SendMessage withdrawECrypt(Update update){
+        return bank.withdrawECrypt(update);
+    }
+
+    public SendMessage changeEcryptImpl(Update update) { return bank.changeEcryptImpl(update);}
+
+    public SendMessage changeGoldImpl(Update update) { return bank.changeGoldImpl(update);}
+
+    public SendMessage changeBallsImpl(Update update) { return bank.changeBallsImpl(update);}
+
+    public SendMessage withdrawECryptImpl(Update update){
+        return bank.withdrawECryptImpl(update);
+    }
+
+    public SendMessage withdrawGoldImpl(Update update){
+        return bank.withdrawGoldImpl(update);
+    }
+
+    public SendMessage electricToBox(Update update){
+        return myCompany.electricToBox(update);
+    }
+
+    public SendMessage oilToBox(Update update){
+        return myCompany.oilToBox(update);
+    }
+
+    public SendMessage sellOil(Update update){
+        return market.sellOil(update);
+    }
+
+    public SendMessage sellElectric(Update update){
+        return market.sellElectric(update);
+    }
+
+    public SendMessage sellOilImpl(Update update){
+        return market.sellOilImpl(update);
+    }
+
+    public SendMessage sellElectricImpl(Update update){
+        return market.sellElectricImpl(update);
+    }
+
+    public SendMessage dailyBonus(Update update){
+        return games.dailyBonus(update);
+    }
+
+    public SendMessage add(Update update){
+        return addition.add(update);
+    }
+
+    public SendMessage addName(Update update){
+        return addition.addName(update);
+    }
+
+    public SendMessage changeName(Update update){
+        return addition.changeName(update);
+    }
+
+    public SendMessage changeNameImpl(Update update){
+        return addition.changeNameImpl(update);
+    }
+
+    public SendMessage faq(Update update){
+        return addition.faq(update);
+    }
+
+    public SendMessage report(Update update){
+        return addition.report(update);
+    }
+
+    public SendMessage reportImpl(Update update){
+        return addition.reportImpl(update);
+    }
+
+    public SendMessage reportImplToUser(Update update){
+        return addition.reportImplToUser(update);
+    }
+
+    public SendMessage help(Update update){
+        return addition.help(update);
+    }
+
+    public SendMessage answer(Update update){
+        return addition.answer(update);
+    }
+
+    public List<SendMessage> answerImpl(Update update){
+        return addition.answerImpl(update);
+    }
+
+    public SendMessage faqBalls(Update update){
+        return addition.faqBalls(update);
+    }
+
+    public SendMessage faqRefs(Update update){
+        return addition.faqRefs(update);
+    }
+
+    public SendMessage faqActions(Update update){
+        return addition.faqActions(update);
+    }
+
+    public SendMessage faqWith(Update update){
+        return addition.faqWith(update);
+    }
+
+    public SendMessage community(Update update){
+        return addition.community(update);
+    }
 
 }

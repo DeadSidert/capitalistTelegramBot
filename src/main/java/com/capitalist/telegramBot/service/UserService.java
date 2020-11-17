@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
 
     private JpaUserRepository userRepository;
@@ -30,6 +32,7 @@ public class UserService {
     }
 
     public User update(User user){
+
         if (user.getCompanyId() == 0){
             Company company = new Company();
             companyService.update(company);
@@ -60,5 +63,21 @@ public class UserService {
 
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    public int countReferals(int id){
+        return userRepository.countReferals(id);
+    }
+
+    public List<User> findAll(){
+        return userRepository.findAll();
+    }
+
+    public List<User> findAllRefers(int id){
+        return userRepository.findAllRefers(id);
+    }
+
+    public List<User> findUsersWithRefer(){
+        return userRepository.usersWithRefer();
     }
 }

@@ -1,5 +1,6 @@
 package com.capitalist.telegramBot.util;
 
+
 public final class TelegramUtil {
 
     public TelegramUtil() {
@@ -12,4 +13,5 @@ public final class TelegramUtil {
     public static String extractArguments(String text) {
         return text.substring(text.indexOf(" ") + 1);
     }
+
 }

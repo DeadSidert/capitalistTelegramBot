@@ -2,7 +2,7 @@ bot:
   token: 1472060655:AAHJhYV74wmWwxisHEmWAtNfi83OAW7WJ-c
   name: capitalistBot
   admin: 1385360520
-  url: http://t.me/WorkCapitalist_bot
+  url: https://t.me/WorkCapitalist_bot
   chat: myChat
   urlStat: tgstat
   urlPayments: payments
