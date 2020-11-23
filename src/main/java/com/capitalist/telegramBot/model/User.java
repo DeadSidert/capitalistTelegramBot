@@ -45,6 +45,7 @@ public class User {
     @Column(name = "balls_2")
     // синие
     private double ballsTwo;
+    private boolean joined;
 
     public User(int userId) {
         this.userId = userId;
@@ -64,5 +65,6 @@ public class User {
         this.qiwi = "";
         this.dailyBonus = false;
         this.countReferals = 0;
+        this.joined = false;
     }
 }

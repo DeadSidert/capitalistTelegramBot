@@ -373,6 +373,9 @@ public class UpdateReceiver {
     public SendMessage task(Update update){
         return myCompany.task(update);
     }
+    public SendMessage getBonusForJoin(Update update){
+        return games.getBonusForJoin(update);
+    }
 
 
 }

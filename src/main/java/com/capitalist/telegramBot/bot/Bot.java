@@ -14,11 +14,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.ChatMember;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -47,6 +50,7 @@ public class Bot extends TelegramLongPollingBot {
     private final CompanyService companyService;
     private final MyCompany myCompany;
     private final Admin admin;
+    private final ChannelService channelService;
 
 
     @Override
@@ -264,6 +268,18 @@ public class Bot extends TelegramLongPollingBot {
         else if ("\uD83D\uDCDC Задания".equalsIgnoreCase(command)){
             executeWithExceptionCheck(updateReceiver.task(update));
         }
+        // сообщение всем
+        else if ("Сообщение всем".equalsIgnoreCase(command)){
+            if (user.getUserId() == Integer.parseInt(botAdmin) || user.getRole().equalsIgnoreCase("admin")){
+                executeWithExceptionCheck(admin.messageToAll(update));
+            }
+            else{
+                sendMessage = MessageBuilder.create(user)
+                        .line("Вы не админ!")
+                        .build();
+                executeWithExceptionCheck(sendMessage);
+            }
+        }
 
 
     }
@@ -443,6 +459,15 @@ public class Bot extends TelegramLongPollingBot {
         else if ("/report".equalsIgnoreCase(callbackQuery.getData())){
             executeWithExceptionCheck(updateReceiver.report(update));
         }
+        // подписка на каналы
+        else if ("/getBonusForJoin".equalsIgnoreCase(callbackQuery.getData())){
+            executeWithExceptionCheck(updateReceiver.getBonusForJoin(update));
+        }
+        // проверка подписки на каналы
+        else if ("/checkChannel".equalsIgnoreCase(callbackQuery.getData())){
+            executeWithExceptionCheck(checkChannel(update));
+        }
+        // ответ на вопрос
         else if ("/answer".equalsIgnoreCase(callbackQuery.getData().split("_")[0])){
             executeWithExceptionCheck(updateReceiver.answer(update));
         }
@@ -555,6 +580,9 @@ public class Bot extends TelegramLongPollingBot {
         else if("create_payment".equalsIgnoreCase(position)){
             executeWithExceptionCheck(admin.createPaymentImpl(update));
       }
+        else if ("messageToAll".equalsIgnoreCase(position)){
+            admin.messageToAllImpl(update).forEach(this::executeWithExceptionCheck);
+      }
     }
 
     public void mainMenu(Update update){
@@ -601,6 +629,41 @@ public class Bot extends TelegramLongPollingBot {
 
     public boolean isText(Update update){
         return update!=null && !update.hasCallbackQuery() && update.hasMessage();
+    }
+
+
+    public SendMessage checkChannel(Update update){
+        int userId = update.getCallbackQuery().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        GetChatMember getChatMember = new GetChatMember();
+        getChatMember.setUserId(userId);
+        List<Channel> channels = channelService.findAll();
+        List<String> statuses = new ArrayList<>();
+        User user = userService.getOrCreate(userId);
+
+        for (Channel c : channels){
+            getChatMember.setChatId(c.getId());
+            ChatMember chatMember = null;
+            try {
+                chatMember = execute(getChatMember);
+            }catch (Exception e){
+                log.error("Бот не добавлен в админы канала" + c.getId());
+            }
+            if (chatMember != null) {
+                statuses.add(chatMember.getStatus());
+            }
+        }
+        if (statuses.contains("left")){
+            return messageBuilder.line("Вы не подписались на все каналы(").build();
+        }
+
+        user.setOilCoin(user.getOilCoin() + 1000);
+        user.setECoin(user.getECoin() + 500);
+        user.setJoined(true);
+        userService.update(user);
+
+        return messageBuilder.line("Вам начислено за подписку: 1000 \uD83C\uDF11 OilCoin\n" +
+                "500 \uD83C\uDF15 ECoin").build();
     }
 
     // каждый час работы электростанций и нефтяных установок

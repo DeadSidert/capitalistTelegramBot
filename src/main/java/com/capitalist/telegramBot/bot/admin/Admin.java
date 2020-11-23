@@ -127,13 +127,51 @@ public class Admin {
         return messages;
     }
 
+    public SendMessage messageToAll(Update update){
+        int userId = update.getMessage().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        User user = userService.getOrCreate(userId);
+        user.setPositions("messageToAll");
+        userService.update(user);
+        return messageBuilder
+                .line("Введите сообщение для всех")
+                .row()
+                .button("Отмена", "/cancel")
+                .build();
+    }
+
+    public List<SendMessage> messageToAllImpl(Update update){
+        int userId = update.getMessage().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        String text = update.getMessage().getText();
+
+        User user = userService.getOrCreate(userId);
+        List<SendMessage> messages = new ArrayList<>();
+        List<User> users = userService.findAll();
+
+        user.setPositions("back");
+        userService.update(user);
+
+        messages.add(messageBuilder.line("Сообщения отправлены!").build());
+
+        users.forEach(u -> {
+            MessageBuilder messageBuilder1 = MessageBuilder.create(String.valueOf(u.getUserId()));
+            messageBuilder
+                    .line("Сообщение от админа:\n\n")
+                    .line(text);
+            messages.add(messageBuilder1.build());
+        });
+        return messages;
+    }
+
     public void createAdminMenu(){
         List<KeyboardRow> rowList = new ArrayList<>();
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.add("Получить список юзеров ожидающих оплату");
+        keyboardRow.add("Выполнить оплату пользователю");
 
         KeyboardRow keyboardRow2 = new KeyboardRow();
-        keyboardRow.add("Выполнить оплату пользователю");
+        keyboardRow2.add("Сообщение всем");
 
         KeyboardRow keyboardRow1 = new KeyboardRow();
         keyboardRow1.add("⬅️ Назад");

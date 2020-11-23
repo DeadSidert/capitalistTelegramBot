@@ -16,6 +16,7 @@ CREATE TABLE usr (
                      qiwi varchar,
                      daily_bonus boolean,
                      count_referals integer,
+                     joined boolean,
                      CONSTRAINT pk_user PRIMARY KEY (user_id)
 );
 
@@ -27,6 +28,12 @@ CREATE TABLE payment (
                          p_time varchar,
                          success boolean,
                          CONSTRAINT pk_payment PRIMARY KEY (id)
+);
+
+CREATE TABLE channel (
+            id varchar,
+            url varchar,
+            CONSTRAINT pk_channel PRIMARY KEY (id)
 );
 
 CREATE TABLE actions (
