@@ -49,12 +49,19 @@ public final class MessageBuilder {
     }
 
     public MessageBuilder button(String text, String callbackData) {
-        row.add(new InlineKeyboardButton().setText(text).setCallbackData(callbackData));
+        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+        inlineKeyboardButton.setText(text);
+        inlineKeyboardButton.setCallbackData(callbackData);
+        row.add(inlineKeyboardButton);
         return this;
     }
 
     public MessageBuilder buttonWithUrl(String text, String callbackData, String url) {
-        row.add(new InlineKeyboardButton().setText(text).setCallbackData(callbackData).setUrl(url));
+        InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+        inlineKeyboardButton.setText(text);
+        inlineKeyboardButton.setCallbackData(callbackData);
+        inlineKeyboardButton.setUrl(url);
+        row.add(inlineKeyboardButton);
         return this;
     }
 
@@ -63,15 +70,17 @@ public final class MessageBuilder {
     }
 
     public SendMessage build() {
-        SendMessage sendMessage = new SendMessage()
-                .setChatId(chatId)
-                .enableMarkdown(true)
-                .setText(sb.toString());
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.enableMarkdown(true);
+        sendMessage.setText(sb.toString());
 
         addRowToKeyboard();
 
         if (!keyboard.isEmpty()) {
-            sendMessage.setReplyMarkup(new InlineKeyboardMarkup().setKeyboard(keyboard));
+            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+            inlineKeyboardMarkup.setKeyboard(keyboard);
+            sendMessage.setReplyMarkup(inlineKeyboardMarkup);
         }
 
         return sendMessage;

@@ -26,9 +26,10 @@ public class UpdateReceiver {
     private final Market market;
     private final Addition addition;
     private final Games games;
+    private final Actions actions;
 
     @Autowired
-    public UpdateReceiver(StartHandler startHandler, CallbackHandler callbackHandler, Bank bank, MyCompany myCompany, Market market, Addition addition, Games games) {
+    public UpdateReceiver(StartHandler startHandler, CallbackHandler callbackHandler, Bank bank, MyCompany myCompany, Market market, Addition addition, Games games, Actions actions) {
         this.startHandler = startHandler;
         this.callbackHandler = callbackHandler;
         this.bank = bank;
@@ -36,6 +37,7 @@ public class UpdateReceiver {
         this.market = market;
         this.addition = addition;
         this.games = games;
+        this.actions = actions;
     }
 
     public SendMessage mainMenu(Update update){
@@ -323,5 +325,54 @@ public class UpdateReceiver {
     public SendMessage community(Update update){
         return addition.community(update);
     }
+
+    public SendMessage action(Update update){
+        return actions.action(update);
+    }
+
+    public SendMessage actions(Update update){
+        return actions.actions(update);
+    }
+
+    public SendMessage buyAction(Update update){
+        return actions.buyAction(update);
+    }
+
+    public SendMessage myActions(Update update){
+        return actions.myActions(update);
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackBuyAction(Update update){
+        return callbackHandler.creatAlertCallbackBuyAction(update);
+    }
+
+    public SendMessage findCompany(Update update){
+        return actions.findCompany(update);
+    }
+
+    public SendMessage findCompanyImpl(Update update){
+        return actions.findCompanyImpl(update);
+    }
+
+    public SendMessage findCompanyCheck(Update update){
+        return actions.findCompanyCheck(update);
+    }
+
+    public SendMessage myActioner(Update update){
+        return actions.myActioner(update);
+    }
+
+    public SendMessage myActionerImpl(Update update){
+        return actions.myActionerImpl(update);
+    }
+
+    public SendMessage topReferals(Update update){
+        return addition.topRefs(update);
+    }
+
+    public SendMessage task(Update update){
+        return myCompany.task(update);
+    }
+
 
 }

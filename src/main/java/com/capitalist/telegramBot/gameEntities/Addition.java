@@ -13,9 +13,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,17 +45,20 @@ public class Addition {
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
 
         createMenu();
-        return messageBuilder
-                .line("\uD83D\uDCA1 Дополнительно")
-                .build()
-                .setReplyMarkup(keyboard);
+        messageBuilder
+                .line("\uD83D\uDCA1 Дополнительно");
+
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(keyboard);
+
+        return sendMessage;
     }
 
     public void createMenu(){
         List<KeyboardRow> rowList = new ArrayList<>();
 
         KeyboardRow keyboardRow = new KeyboardRow();
-        keyboardRow.add("⚙️ Настройки");
+        keyboardRow.add("\uD83D\uDC65 ТОП по рефералам");
         keyboardRow.add("\uD83D\uDCDD Название");
 
         KeyboardRow keyboardRow1 = new KeyboardRow();
@@ -60,7 +66,6 @@ public class Addition {
         keyboardRow1.add("\uD83D\uDCAC Сообщество");
 
         KeyboardRow keyboardRow2 = new KeyboardRow();
-        keyboardRow2.add("\uD83D\uDC65 ТОП по рефералам");
         keyboardRow2.add("⬅️ Назад");
 
         rowList.add(keyboardRow);
@@ -327,6 +332,51 @@ public class Addition {
                         " \uD83C\uDDF7\uD83C\uDDFA@" + chat + "\uD83C\uDDF7\uD83C\uDDFA\n" +
                         " \n" +
                         "Если Вы ранее не вступали в чат, Вы получите награду.")
+                .build();
+    }
+
+    public SendMessage topRefs(Update update){
+        int userId = update.getMessage().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        User user = userService.getOrCreate(userId);
+
+        LocalDate currentDate = LocalDate.now();
+        LocalDate nextMonday = currentDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+
+        Duration between = Duration.between(currentDate.atStartOfDay(), nextMonday.atStartOfDay());
+
+        List<User> usrs = userService.findUsersWithRefer();
+        List<User> users = new ArrayList<>();
+        for (User usr : usrs){
+            users.add(userService.getOrCreate(usr.getReferId()));
+        }
+        users.sort(Comparator.comparing(User::getCountReferals));
+
+        String[] arr = new String[]{"1️⃣", "2️⃣", "3️⃣", "4️⃣","5️⃣","6️⃣", "7️⃣","8️⃣","9️⃣","\uD83D\uDD1F"};
+
+        messageBuilder
+                .line("\uD83D\uDC65 ТОП по рефералам\n" +
+                        "\n" +
+                        " Перед Вами ТОП игроков по приглашению рефералов. \n" +
+                        " По истечении каждых двух недель, счёт обнуляется и все игроки, попавшие в \uD83D\uDD25ТОП\uD83D\uDD1F, получают награду!\n" +
+                        " \n" +
+                        "До конца конкурса осталось: \n" +
+                        between.toDays() +" д. \n" +
+                        "За этот конкурс Вы пригласили: "+ user.getCountReferals() +" чел.\n" +
+                        " \n" +
+                        "\uD83D\uDD25ТОП\uD83D\uDD1F участников:")
+                .line();
+
+        for (int i = 0; i < 10;i++){
+            if (users.size()<i+1){
+                return messageBuilder
+                        .build();
+            }
+            Company company = companyService.getOrCreate(users.get(i).getCompanyId());
+            messageBuilder
+                   .line(arr[i] + company.getName() + " - пригласил " + users.get(i).getCountReferals() + " чел.");
+        }
+        return messageBuilder
                 .build();
     }
 }

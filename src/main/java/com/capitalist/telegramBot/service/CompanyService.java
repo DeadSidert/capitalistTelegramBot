@@ -42,4 +42,8 @@ public class CompanyService {
     public void delete(int id){
         companyRepository.deleteById(id);
     }
+
+    public List<Company> findCompaniesWithName(){
+        return companyRepository.findCompaniesWithName();
+    }
 }

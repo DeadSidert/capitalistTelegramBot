@@ -54,8 +54,8 @@ public class Bank {
                         eCoin + " \uD83C\uDF15 ECoin\n" +
                         gold + " \uD83D\uDCB0 Gold\n" +
                         eCrypt + " ⚡️ ECrypt\n" +
-                        ballsOne + " \uD83D\uDD37 Баллы\n" +
-                        ballsTwo + " \uD83D\uDD36 Баллы")
+                        ballsOne + " \uD83D\uDD36 Баллы\n" +
+                        ballsTwo + " \uD83D\uDD37 Баллы")
                 .row()
                 .button("\uD83D\uDCB8 Пополнение баланса(\uD83D\uDD36 \uD83D\uDD37 \uD83C\uDF15 \uD83C\uDF11)", "/payment")
                 .row()
@@ -184,7 +184,10 @@ public class Bank {
         user.setPositions("change_ecrypt");
         userService.update(user);
 
-        return messageBuilder.build().setReplyMarkup(keyboard);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(keyboard);
+
+        return sendMessage;
     }
     // вызов при позиции change_ecrypt
     public SendMessage changeEcryptImpl(Update update) {
@@ -204,10 +207,12 @@ public class Bank {
         int eCrypt = user.getECrypt();
         createCancel();
         if (eCrypt < quantity || eCrypt < 1){
-            return messageBuilder
+            messageBuilder
                     .line("У вас недостаточно ECrypt или вы ввели кол-во меньше 1\n")
-                    .line("Введите другое число")
-                    .build().setReplyMarkup(keyboard);
+                    .line("Введите другое число");
+            SendMessage sendMessage = messageBuilder.build();
+            sendMessage.setReplyMarkup(keyboard);
+            return sendMessage;
         } else {
             int eCoin = user.getECoin();
 
@@ -229,7 +234,10 @@ public class Bank {
             user.setPositions("back");
             userService.update(user);
 
-            return messageBuilder.build().setReplyMarkup(keyboard);
+            SendMessage sendMessage = messageBuilder.build();
+            sendMessage.setReplyMarkup(keyboard);
+
+            return sendMessage;
         }
     }
 
@@ -249,7 +257,10 @@ public class Bank {
         user.setPositions("change_gold");
         userService.update(user);
 
-        return messageBuilder.build().setReplyMarkup(keyboard);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(keyboard);
+
+        return sendMessage;
     }
     // вызов при позиции change_gold
     public SendMessage changeGoldImpl(Update update) {
@@ -269,10 +280,12 @@ public class Bank {
         int gold = user.getGold();
         createCancel();
         if (gold < quantity || gold < 1){
-            return messageBuilder
+            messageBuilder
                     .line("У вас недостаточно \uD83D\uDCB0 Gold или вы ввели кол-во меньше 1\n")
-                    .line("Введите другое число")
-                    .build().setReplyMarkup(keyboard);
+                    .line("Введите другое число");
+            SendMessage sendMessage = messageBuilder.build();
+            sendMessage.setReplyMarkup(keyboard);
+            return sendMessage;
         } else {
             int oilCoin = user.getOilCoin();
 
@@ -294,7 +307,10 @@ public class Bank {
             user.setPositions("back");
             userService.update(user);
 
-            return messageBuilder.build().setReplyMarkup(keyboard);
+            SendMessage sendMessage = messageBuilder.build();
+            sendMessage.setReplyMarkup(keyboard);
+
+            return sendMessage;
         }
     }
 
@@ -314,7 +330,10 @@ public class Bank {
         user.setPositions("change_balls");
         userService.update(user);
 
-        return messageBuilder.build().setReplyMarkup(keyboard);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(keyboard);
+
+        return sendMessage;
     }
     // вызов при позиции change_balls
     public SendMessage changeBallsImpl(Update update) {
@@ -334,10 +353,12 @@ public class Bank {
         double ball1 = user.getBallsOne();
         createCancel();
         if (ball1 < quantity || ball1 < 1){
-            return messageBuilder
+            messageBuilder
                     .line("У вас недостаточно \uD83D\uDD36 баллов или вы ввели кол-во меньше 1\n")
-                    .line("Введите другое число")
-                    .build().setReplyMarkup(keyboard);
+                    .line("Введите другое число");
+            SendMessage sendMessage = messageBuilder.build();
+            sendMessage.setReplyMarkup(keyboard);
+            return sendMessage;
         } else {
             double ball2 = user.getBallsTwo();
 
@@ -359,7 +380,10 @@ public class Bank {
             user.setPositions("back");
             userService.update(user);
 
-            return messageBuilder.build().setReplyMarkup(keyboard);
+            SendMessage sendMessage = messageBuilder.build();
+            sendMessage.setReplyMarkup(keyboard);
+
+            return sendMessage;
         }
     }
 
@@ -375,7 +399,7 @@ public class Bank {
                         "\n" +
                         "\uD83C\uDFE6 Баланс:\n" +
                         gold+ " \uD83D\uDCB0 Gold\n" +
-                        eCrypt +"0 ⚡️ ECrypt\n" +
+                        eCrypt +" ⚡️ ECrypt\n" +
                         "\n" +
                         "\uD83D\uDD12 Минимум для вывода:\n" +
                         "1000 Gold\n" +
@@ -405,7 +429,10 @@ public class Bank {
         userService.update(user);
         createCancel();
 
-        return messageBuilder.build().setReplyMarkup(keyboard);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(keyboard);
+
+        return sendMessage;
     }
     // ввести голду для вывода
     public SendMessage withdrawGoldImpl(Update update){
@@ -479,7 +506,10 @@ public class Bank {
         userService.update(user);
         createCancel();
 
-        return messageBuilder.build().setReplyMarkup(keyboard);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(keyboard);
+
+        return sendMessage;
     }
 
     // ввести ECrypt для вывода

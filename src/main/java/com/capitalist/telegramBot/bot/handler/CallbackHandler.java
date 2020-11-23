@@ -123,9 +123,9 @@ public class CallbackHandler {
         int oil = market.getUserCompany((update.getCallbackQuery().getFrom().getId())).getOil();
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
         answerCallbackQuery
-                .setCallbackQueryId(id)
-                .setShowAlert(true)
-                .setText("\uD83D\uDEAB Минимум для продажи 500 \uD83D\uDEE2 \n" +
+                .setCallbackQueryId(id);
+                 answerCallbackQuery.setShowAlert(true);
+                 answerCallbackQuery.setText("\uD83D\uDEAB Минимум для продажи 500 \uD83D\uDEE2 \n" +
                         "баррелей нефти, а у вас только " + oil + "\n" +
                         "баррелей нефти");
         return answerCallbackQuery;
@@ -135,10 +135,9 @@ public class CallbackHandler {
         String id = update.getCallbackQuery().getId();
         int electric = market.getUserCompany((update.getCallbackQuery().getFrom().getId())).getElectric();
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery
-                .setCallbackQueryId(id)
-                .setShowAlert(true)
-                .setText("\uD83D\uDEAB Минимум для продажи 500 \uD83D\uDD0B" +
+        answerCallbackQuery.setCallbackQueryId(id);
+        answerCallbackQuery.setShowAlert(true);
+        answerCallbackQuery.setText("\uD83D\uDEAB Минимум для продажи 500 \uD83D\uDD0B" +
                         "килловатт энергии, а у вас только " + electric + "\n" +
                         "килловатт энергии");
         return answerCallbackQuery;
@@ -149,10 +148,9 @@ public class CallbackHandler {
         int userId = update.getCallbackQuery().getFrom().getId();
         int money = userService.getOrCreate(userId).getOilCoin();
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery
-                .setCallbackQueryId(id)
-                .setShowAlert(true)
-                .setText("\uD83D\uDEAB У вас не хватает \uD83C\uDF11 OilCoin для" +
+        answerCallbackQuery.setCallbackQueryId(id);
+        answerCallbackQuery.setShowAlert(true);
+        answerCallbackQuery.setText("\uD83D\uDEAB У вас не хватает \uD83C\uDF11 OilCoin для" +
                         "\nпокупки этого насоса! Ваш баланс: " + money +"\n" +
                         "OilCoin");
         return answerCallbackQuery;
@@ -163,22 +161,32 @@ public class CallbackHandler {
         int userId = update.getCallbackQuery().getFrom().getId();
         int money = userService.getOrCreate(userId).getECoin();
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery
-                .setCallbackQueryId(id)
-                .setShowAlert(true)
-                .setText("\uD83D\uDEAB У вас не хватает \uD83C\uDF15 ECoin для" +
+        answerCallbackQuery.setCallbackQueryId(id);
+        answerCallbackQuery.setShowAlert(true);
+        answerCallbackQuery.setText("\uD83D\uDEAB У вас не хватает \uD83C\uDF15 ECoin для" +
                         "\nпокупки этого насоса! Ваш баланс: " + money +"\n" +
                         "ECoin");
+        return answerCallbackQuery;
+    }
+
+    public AnswerCallbackQuery creatAlertCallbackBuyAction(Update update){
+        String id = update.getCallbackQuery().getId();
+        int userId = update.getCallbackQuery().getFrom().getId();
+        double money = userService.getOrCreate(userId).getBallsTwo();
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery.setCallbackQueryId(id);
+        answerCallbackQuery.setShowAlert(true);
+        answerCallbackQuery.setText("\uD83D\uDEAB У вас не хватает \uD83D\uDD37 баллов для" +
+                        "\nпокупки акции! Ваш баланс: " + money);
         return answerCallbackQuery;
     }
 
     public AnswerCallbackQuery creatAlertCallbackReturnTrain(Update update){
         String id = update.getCallbackQuery().getId();
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
-        answerCallbackQuery
-                .setCallbackQueryId(id)
-                .setShowAlert(true)
-                .setText("Обучение началось!");
+        answerCallbackQuery.setCallbackQueryId(id);
+        answerCallbackQuery.setShowAlert(true);
+        answerCallbackQuery.setText("Обучение началось!");
         return answerCallbackQuery;
     }
 
@@ -186,6 +194,7 @@ public class CallbackHandler {
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
 
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
@@ -206,6 +215,7 @@ public class CallbackHandler {
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
+        replyKeyboardMarkup.setResizeKeyboard(true);
 
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
@@ -214,7 +224,10 @@ public class CallbackHandler {
                 .line("\uD83D\uDCC3 Главное меню");
 
         createMenuMain();
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        return sendMessage;
     }
 
     public void createMenuMain(){

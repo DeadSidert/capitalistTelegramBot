@@ -26,6 +26,7 @@ public class User {
     private Integer eCrypt;
     private Integer companyId;
     private Integer referId;
+    private Integer countReferals;
     private String regDate;
     private Integer taskCompleted;
     private String qiwi;
@@ -62,5 +63,6 @@ public class User {
         this.regDate = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
         this.qiwi = "";
         this.dailyBonus = false;
+        this.countReferals = 0;
     }
 }

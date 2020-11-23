@@ -18,10 +18,16 @@ public class Company {
     private int oil;
     private int electric;
     private String name;
+    private int userPercent;
+    private int electricProduct;
+    private int oilProduct;
 
     public Company() {
         this.oil = 0;
         this.electric = 0;
         this.name = "Без названия";
+        this.userPercent = 70;
+        this.electricProduct = 0;
+        this.oilProduct = 0;
     }
 }

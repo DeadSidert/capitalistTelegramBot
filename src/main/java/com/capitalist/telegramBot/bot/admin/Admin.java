@@ -5,6 +5,7 @@ import com.capitalist.telegramBot.model.Payment;
 import com.capitalist.telegramBot.model.User;
 import com.capitalist.telegramBot.service.PaymentService;
 import com.capitalist.telegramBot.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -15,16 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class Admin {
 
     private final UserService userService;
     private final ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
     private final PaymentService paymentService;
-
-    public Admin(UserService userService, PaymentService paymentService) {
-        this.userService = userService;
-        this.paymentService = paymentService;
-    }
 
     public SendMessage admin(Update update){
         int userId = update.getMessage().getFrom().getId();
@@ -33,7 +30,10 @@ public class Admin {
                 .line("Вы успешно авторизовались");
         createAdminMenu();
 
-        return messageBuilder.build().setReplyMarkup(keyboard);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(keyboard);
+
+        return sendMessage;
     }
 
     public SendMessage checkPayments(Update update){
@@ -49,8 +49,8 @@ public class Admin {
         for (Payment p : payments){
             String success = p.getSuccess() ? "Да" : "Нет";
             messageBuilder
-                    .line("Номер запроса: " + p.getId() + " | userId: " + p.getUserId() + " | Сумма: "
-                            + p.getSum() + " | Время запроса: " + p.getTime() + "| Выполнено: " + success);
+                    .line("\n\nНомер транзакции: " + p.getId() + " | userId: " + p.getUserId() + " | Сумма: "
+                            + p.getSum() + " | Время запроса: " + p.getTime() + " " + p.getPTime() + "| Выполнено: " + success);
         }
         return messageBuilder.build();
     }
@@ -78,15 +78,53 @@ public class Admin {
             return messageBuilder.line("Вы ввели не число").build();
         }
         User user = userService.getOrCreate(p.getUserId());
+        user.setPositions("back");
+        userService.update(user);
 
         messageBuilder
-                .line("Номер запроса: " + p.getId() + " | userId: " + p.getUserId() + " | Сумма: "
-                        + p.getSum() + " | Время запроса: " + p.getTime() + " | Номер: " + user.getQiwi())
+                .line("Номер транзакции: " + p.getId() + " | userId: " + p.getUserId() + " | Сумма: "
+                        + p.getSum() + " рублей | Время запроса: " + p.getTime() + " | Номер: " + user.getQiwi())
                 .row()
                 .button("Оплачено", "/success_" + p.getId())
                 .row()
-                .button("✖️ Отмена", "/cancel");
+                .button("Отменено", "/notSuc_" + p.getId());
         return messageBuilder.build();
+    }
+
+    public List<SendMessage> success(Update update){
+        int userId = update.getCallbackQuery().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        int transId = Integer.parseInt(update.getCallbackQuery().getData().split("_")[1]);
+        Payment p = paymentService.findById(transId);
+        List<SendMessage> messages = new ArrayList<>();
+        int paymenterId = p.getUserId();
+
+        p.setSuccess(true);
+        paymentService.update(p);
+        messages.add(messageBuilder.line("Оплата выполнена").build());
+        messageBuilder = MessageBuilder.create(String.valueOf(paymenterId));
+        messages.add(messageBuilder.line("Вам выплачено " + p.getSum()).build());
+
+        return messages;
+    }
+
+    public List<SendMessage> notSuccess(Update update){
+        int userId = update.getCallbackQuery().getFrom().getId();
+        MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        int transId = Integer.parseInt(update.getCallbackQuery().getData().split("_")[1]);
+        Payment p = paymentService.findById(transId);
+        List<SendMessage> messages = new ArrayList<>();
+        int paymenterId = p.getUserId();
+
+        p.setSuccess(true);
+        paymentService.update(p);
+        messages.add(messageBuilder.line("Оплата отменена").build());
+        messageBuilder = MessageBuilder.create(String.valueOf(paymenterId));
+        messages.add(messageBuilder.line("Ваша выплата отменена! обратитесь к " +
+                "админу через обратную связь, указав номер транзакции\n" +
+                "Номер транзакции: " + p.getId()).build());
+
+        return messages;
     }
 
     public void createAdminMenu(){

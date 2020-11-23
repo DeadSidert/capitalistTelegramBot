@@ -61,6 +61,8 @@ public class Market {
 
         return messageBuilder
                 .line("Введите кол-во \uD83D\uDEE2 баррелей нефти для продажи")
+                .row()
+                .button("Отмена", "/cancel")
                 .build();
     }
      // ввести кол-во нефти для продажи
@@ -116,6 +118,8 @@ public class Market {
 
         return messageBuilder
                 .line("Введите кол-во \uD83D\uDD0B киловатт энергии")
+                .row()
+                .button("Отмена", "/cancel")
                 .build();
     }
 

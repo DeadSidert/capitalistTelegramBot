@@ -2,12 +2,9 @@ package com.capitalist.telegramBot.bot;
 
 import com.capitalist.telegramBot.bot.admin.Admin;
 import com.capitalist.telegramBot.bot.builder.MessageBuilder;
-import com.capitalist.telegramBot.model.OilPump;
-import com.capitalist.telegramBot.model.Powerhouse;
-import com.capitalist.telegramBot.model.User;
-import com.capitalist.telegramBot.service.OilPumpService;
-import com.capitalist.telegramBot.service.PowerhouseService;
-import com.capitalist.telegramBot.service.UserService;
+import com.capitalist.telegramBot.gameEntities.MyCompany;
+import com.capitalist.telegramBot.model.*;
+import com.capitalist.telegramBot.service.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +43,9 @@ public class Bot extends TelegramLongPollingBot {
     private final UserService userService;
     private final OilPumpService oilPumpService;
     private final PowerhouseService powerhouseService;
+    private final ActionsService actionsService;
+    private final CompanyService companyService;
+    private final MyCompany myCompany;
     private final Admin admin;
 
 
@@ -83,10 +83,26 @@ public class Bot extends TelegramLongPollingBot {
         if (command.split(" ").length > 1){
             String[] c = command.split(" ");
             if (c[0].equalsIgnoreCase("/start") && user.getReferId() == 0){
+                int referId = 0;
+                try {
+                    referId = Integer.parseInt(c[1]);
+                }catch (Exception e){
+                    log.error("Неправильно введен id рефера");
+                }
                 user.setReferId(Integer.parseInt(c[1]));
+                User refer = userService.getOrCreate(referId);
+                refer.setOilCoin(user.getOilCoin() + 40);
+                refer.setECoin(user.getECoin() + 20);
+                refer.setCountReferals(user.getCountReferals()+1);
+
                 userService.update(user);
+                userService.update(refer);
                 sendMessage = updateReceiver.start(update);
                 executeWithExceptionCheck(sendMessage);
+
+                MessageBuilder messageBuilder = MessageBuilder.create(refer);
+                messageBuilder.line("У вас новый реферал! Вы получили бонус :)");
+                executeWithExceptionCheck(messageBuilder.build());
             }
         }
 
@@ -105,6 +121,30 @@ public class Bot extends TelegramLongPollingBot {
                        .line("Вы не админ!")
                        .build();
                executeWithExceptionCheck(sendMessage);
+            }
+        }
+        // выполнить оплату юзеру по id
+        else if ("Выполнить оплату пользователю".equalsIgnoreCase(command)){
+            if (user.getUserId() == Integer.parseInt(botAdmin) || user.getRole().equalsIgnoreCase("admin")){
+                executeWithExceptionCheck(admin.createPayment(update));
+            }
+            else{
+                sendMessage = MessageBuilder.create(user)
+                        .line("Вы не админ!")
+                        .build();
+                executeWithExceptionCheck(sendMessage);
+            }
+        }
+        // список запросов на выплату
+        else if ("Получить список юзеров ожидающих оплату".equalsIgnoreCase(command)){
+            if (user.getUserId() == Integer.parseInt(botAdmin) || user.getRole().equalsIgnoreCase("admin")){
+                executeWithExceptionCheck(admin.checkPayments(update));
+            }
+            else{
+                sendMessage = MessageBuilder.create(user)
+                        .line("Вы не админ!")
+                        .build();
+                executeWithExceptionCheck(sendMessage);
             }
         }
         // Обучение
@@ -199,6 +239,30 @@ public class Bot extends TelegramLongPollingBot {
         // сообщество
         else if ("\uD83D\uDCAC Сообщество".equalsIgnoreCase(command)){
             executeWithExceptionCheck(updateReceiver.community(update));
+        }
+        // биржа
+        else if ("\uD83C\uDFEB Биржа".equalsIgnoreCase(command)){
+            executeWithExceptionCheck(updateReceiver.action(update));
+        }
+        // акции в бирже
+        else if ("\uD83D\uDCC9 Акции".equalsIgnoreCase(command)){
+            executeWithExceptionCheck(updateReceiver.actions(update));
+        }
+        // мои акции
+        else if ("\uD83D\uDCD1 Мои акции".equalsIgnoreCase(command)){
+            executeWithExceptionCheck(updateReceiver.myActions(update));
+        }
+        else if ("\uD83D\uDD0E Поиск компаний".equalsIgnoreCase(command)){
+            executeWithExceptionCheck(updateReceiver.findCompany(update));
+        }
+        else if ("\uD83D\uDCBC Мой акционер".equalsIgnoreCase(command)){
+            executeWithExceptionCheck(updateReceiver.myActioner(update));
+        }
+        else if ("\uD83D\uDC65 ТОП по рефералам".equalsIgnoreCase(command)){
+            executeWithExceptionCheck(updateReceiver.topReferals(update));
+        }
+        else if ("\uD83D\uDCDC Задания".equalsIgnoreCase(command)){
+            executeWithExceptionCheck(updateReceiver.task(update));
         }
 
 
@@ -351,6 +415,26 @@ public class Bot extends TelegramLongPollingBot {
             executeWithExceptionCheck(updateReceiver.callbackStart(update));
             executeAnswerCallback(updateReceiver.creatAlertCallbackReturnTrain(update));
         }
+        // 1 задание
+        else if ("/taskOne".equalsIgnoreCase(callbackQuery.getData())){
+         myCompany.taskOne(update).forEach(this::executeWithExceptionCheck);
+        }
+        // 2 задание
+        else if ("/taskTwo".equalsIgnoreCase(callbackQuery.getData())){
+            myCompany.taskTwoImpl(update).forEach(this::executeWithExceptionCheck);
+        }
+        // 3 задание
+        else if ("/taskThree".equalsIgnoreCase(callbackQuery.getData())){
+            myCompany.taskThreeImpl(update).forEach(this::executeWithExceptionCheck);
+        }
+        // 4 задание
+        else if ("/taskFour".equalsIgnoreCase(callbackQuery.getData())){
+            myCompany.taskFourImpl(update).forEach(this::executeWithExceptionCheck);
+        }
+        // 5 задание
+        else if ("/taskFive".equalsIgnoreCase(callbackQuery.getData())){
+            myCompany.taskFiveImpl(update).forEach(this::executeWithExceptionCheck);
+        }
         // faq
         else if ("/faq".equalsIgnoreCase(callbackQuery.getData())){
             executeWithExceptionCheck(updateReceiver.faq(update));
@@ -378,8 +462,31 @@ public class Bot extends TelegramLongPollingBot {
         else if ("/faq_refs".equalsIgnoreCase(callbackQuery.getData())){
             executeWithExceptionCheck(updateReceiver.faqRefs(update));
         }
-
-
+        // купить акции
+        else if ("/buy_action".equalsIgnoreCase(callbackQuery.getData())){
+            User user = userService.getOrCreate(update.getCallbackQuery().getFrom().getId());
+            if (user.getBallsTwo() < 0.75){
+                executeAnswerCallback(updateReceiver.creatAlertCallbackBuyAction(update));
+            }else {
+                executeWithExceptionCheck(updateReceiver.buyAction(update));
+            }
+        }
+        // поиск компании
+        else if ("/find_company".equalsIgnoreCase(callbackQuery.getData())){
+            executeWithExceptionCheck(updateReceiver.findCompanyImpl(update));
+        }
+        // покупка акций своей компании
+        else if ("/buy_myActions".equalsIgnoreCase(callbackQuery.getData())){
+            executeWithExceptionCheck(updateReceiver.myActionerImpl(update));
+        }
+        // выплата успешна
+        else if ("/success".equalsIgnoreCase(callbackQuery.getData().split("_")[0])){
+            admin.success(update).forEach(this::executeWithExceptionCheck);
+        }
+        // выплата отменена
+        else if ("/notSuc".equalsIgnoreCase(callbackQuery.getData().split("_")[0])){
+            admin.notSuccess(update).forEach(this::executeWithExceptionCheck);
+        }
     }
 
     public void fabricPosition(Update update, String position){
@@ -442,6 +549,12 @@ public class Bot extends TelegramLongPollingBot {
         else if ("answer".equalsIgnoreCase(position.split("_")[0])){
           updateReceiver.answerImpl(update).forEach(this::executeWithExceptionCheck);
         }
+        else if ("find_company".equalsIgnoreCase(position)){
+            executeWithExceptionCheck(updateReceiver.findCompanyCheck(update));
+      }
+        else if("create_payment".equalsIgnoreCase(position)){
+            executeWithExceptionCheck(admin.createPaymentImpl(update));
+      }
     }
 
     public void mainMenu(Update update){
@@ -486,13 +599,6 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendStartReport() {
-        executeWithExceptionCheck(new SendMessage()
-                .setChatId(botAdmin)
-                .setText("Bot start up is successful"));
-        log.debug("Start report sent to Admin");
-    }
-
     public boolean isText(Update update){
         return update!=null && !update.hasCallbackQuery() && update.hasMessage();
     }
@@ -503,36 +609,66 @@ public class Bot extends TelegramLongPollingBot {
         List<Powerhouse> powerhouses = powerhouseService.findAllUsersPower();
         List<OilPump> oilPumps = oilPumpService.findAllByUsersOil();
 
-        powerhouses.forEach(powerhouse -> powerhouse.setProducted(powerhouse.getProducted() + powerhouse.getProduction()));
-        oilPumps.forEach(oilPump -> oilPump.setProducted(oilPump.getProducted() + oilPump.getProduction()));
+        powerhouses.forEach(powerhouse -> powerhouse.setProducted(powerhouse.getProducted() + (powerhouse.getProduction()/100)*30));
+        oilPumps.forEach(oilPump -> oilPump.setProducted(oilPump.getProducted() + (oilPump.getProduction()/100)*70));
 
         powerhouses.forEach(powerhouseService::save);
         oilPumps.forEach(oilPumpService::save);
     }
 
+    // обновление ежедневного бонуса
     @Scheduled(fixedDelay = 86400000)
     public void dailyBonus(){
         List<User> users = userService.findAll();
-        users.forEach(u -> u.setDailyBonus(false));
+        users.forEach(u -> {
+            u.setDailyBonus(false);
+            MessageBuilder messageBuilder = MessageBuilder.create(u);
+            SendMessage sendMessage = messageBuilder.line("Ваш ежедневный бонус обновлен").build();
+            executeWithExceptionCheck(sendMessage);
+        });
         users.forEach(userService::update);
     }
 
+    // получает за реферала
     @Scheduled(fixedDelay = 3600000)
     private void refCost(){
         List<User> users = userService.findUsersWithRefer();
         for (User u : users){
+            int percent = 30;
             User refer = userService.getOrCreate(u.getReferId());
             int oilCoin = 0;
             int eCoin = 0;
-            List<Powerhouse> powerhouses = powerhouseService.findByUserId(u.getReferId());
-            List<OilPump> oilPumps = oilPumpService.findByUserId(u.getReferId());
+            Company company = companyService.getOrCreate(refer.getCompanyId());
 
-            eCoin = powerhouses.stream().mapToInt(Powerhouse::getProduction).sum();
-            oilCoin = oilPumps.stream().mapToInt(OilPump::getProduction).sum();
+            eCoin = company.getElectricProduct();
+            oilCoin = company.getOilProduct();
 
-            refer.setECoin(refer.getECoin() + eCoin);
+            refer.setECoin(refer.getECoin() + (eCoin/100)*percent);
             refer.setOilCoin(refer.getOilCoin() + oilCoin);
             userService.update(refer);
+        }
+    }
+
+    // деньги за акции
+    @Scheduled(fixedDelay = 3600000)
+    private void actions(){
+        List<Action> actions = actionsService.findAll();
+        for (Action action : actions){
+            User actioner = userService.getOrCreate(action.getUserId());
+            Company company = companyService.getOrCreate(action.getCompanyId());
+            int quantity = action.getQuantity();
+
+            int oilCoin = ((company.getOilProduct()/100)*30)*quantity;
+            int eCoin =   ((company.getElectricProduct()/100)*30)*quantity;
+
+            actioner.setOilCoin(actioner.getOilCoin() + oilCoin);
+            actioner.setECoin(actioner.getECoin() + eCoin);
+
+            userService.update(actioner);
+            MessageBuilder messageBuilder = MessageBuilder.create(actioner);
+            SendMessage sendMessage = messageBuilder.line("Вы получили с акции компании " + company.getName() +
+                    " OilCoin: " + oilCoin + " и ECoin: " + eCoin).build();
+            executeWithExceptionCheck(sendMessage);
         }
     }
 

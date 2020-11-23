@@ -1,15 +1,32 @@
 bot:
-  token: 1472060655:AAHJhYV74wmWwxisHEmWAtNfi83OAW7WJ-c
+  token: 1392424435:AAFWlQHWheZY26S6xCMNXtRyN0E_7-8V6h8
   name: capitalistBot
-  admin: 1385360520
-  url: https://t.me/WorkCapitalist_bot
+  admin: 213411446
+  url: https://t.me/minekonkurs_bot
   chat: myChat
   urlStat: tgstat
   urlPayments: payments
   adminUsername: admin
 
+server:
+  port: 8072
+
 spring:
+  liquibase:
+    enabled: true
+    contexts: test
+  jpa:
+    properties:
+      hibernate.show_sql: false
+      hibernate:format_sql: false
+    open-in-view: false
+    hibernate.ddl-auto: none
   datasource:
-    url: jdbc:postgresql://localhost:5432/capitalist_bot
-    username: postgres
+    #  Note that the hostname, port and database name on url property and username and password properties will be ignored
+    #  and it will be used default container values
+    url: jdbc:postgresql://localhost:5432/telega4?user=nikita&password=91823God&currentSchema=public
+    driver-class-name: org.postgresql.Driver
+    username: nikita
     password: 91823God
+    hikari:
+      schema: public

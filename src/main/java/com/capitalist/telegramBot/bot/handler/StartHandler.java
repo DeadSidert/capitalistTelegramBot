@@ -62,7 +62,9 @@ public class StartHandler {
                         "Нажмите \uD83D\uDDDE, чтобы перейти к обучению или \uD83D\uDCF0, чтобы пропустить его");
         createStartMenu();
 
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        return sendMessage;
     }
 
     public SendMessage callbackStart(Update update) {
@@ -89,7 +91,9 @@ public class StartHandler {
                         "Нажмите \uD83D\uDDDE, чтобы перейти к обучению или \uD83D\uDCF0, чтобы пропустить его");
         createStartMenu();
 
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        return sendMessage;
     }
 
     public void createStartMenu() {
@@ -139,7 +143,9 @@ public class StartHandler {
         User user = userService.getOrCreate(userId);
         user.setPositions("train_1");
         userService.update(user);
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        return sendMessage;
     }
 
     public SendMessage stepThree(Update update) {
@@ -170,7 +176,10 @@ public class StartHandler {
         user.setPositions("train_2");
         userService.update(user);
 
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        return sendMessage;
     }
 
     public void createStartMenuThree() {
@@ -205,7 +214,9 @@ public class StartHandler {
         user.setPositions("train_3");
         userService.update(user);
 
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        return sendMessage;
     }
 
     public SendMessage stepFive(Update update) {
@@ -232,7 +243,9 @@ public class StartHandler {
         user.setPositions("train_4");
         userService.update(user);
 
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+        return sendMessage;
     }
 
     public void createStartMenuFour(){
@@ -248,6 +261,7 @@ public class StartHandler {
         ArrayList<KeyboardRow> rows = new ArrayList<>();
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.add("\uD83C\uDFC1");
+        replyKeyboardMarkup.setResizeKeyboard(true);
 
         rows.add(keyboardRow);
         replyKeyboardMarkup.setKeyboard(rows);
@@ -271,6 +285,7 @@ public class StartHandler {
     public void createStartMenuSix(){
         ArrayList<KeyboardRow> rows = new ArrayList<>();
         KeyboardRow keyboardRow = new KeyboardRow();
+        replyKeyboardMarkup.setResizeKeyboard(true);
 
         keyboardRow.add("\uD83C\uDFED Моя компания");
         keyboardRow.add("\uD83C\uDFEB Биржа");
@@ -322,6 +337,10 @@ public class StartHandler {
                 .line("\uD83D\uDCC3 Главное меню");
 
         createStartMenuSix();
-        return messageBuilder.build().setReplyMarkup(replyKeyboardMarkup);
+
+        SendMessage sendMessage = messageBuilder.build();
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        return sendMessage;
     }
 }

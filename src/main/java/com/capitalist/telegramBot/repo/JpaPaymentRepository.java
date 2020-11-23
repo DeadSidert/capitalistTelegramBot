@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface JpaPaymentRepository extends JpaRepository<Payment, Integer> {
 
-    @Query("SELECT p from Payment p where p.success=true")
+    @Query("SELECT p from Payment p where p.success=false")
     List<Payment> findAllBySuccess();
 }
