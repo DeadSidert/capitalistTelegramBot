@@ -1,12 +1,12 @@
 bot:
-  token: 1392424435:AAFWlQHWheZY26S6xCMNXtRyN0E_7-8V6h8
-  name: capitalistBot
-  admin: 213411446
-  url: https://t.me/minekonkurs_bot
-  chat: myChat
+  token:
+  name: Monopoly
+  admin:
+  url: https://t.me/MonopolyGameBot
+  chat: https://t.me/joinchat/Pl2W7RlQSBCGbHeft5xEBw
   urlStat: tgstat
   urlPayments: payments
-  adminUsername: admin
+  adminUsername: fry55
 
 server:
   port: 8072
@@ -24,7 +24,7 @@ spring:
   datasource:
     #  Note that the hostname, port and database name on url property and username and password properties will be ignored
     #  and it will be used default container values
-    url: jdbc:postgresql://localhost:5432/telega4?user=nikita&password=91823God&currentSchema=public
+    url: jdbc:postgresql://localhost:5432/telega5?user=nikita&password=91823God&currentSchema=public
     driver-class-name: org.postgresql.Driver
     username: nikita
     password: 91823God

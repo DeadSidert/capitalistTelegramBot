@@ -33,7 +33,7 @@ public class CallbackHandler {
     private String botName;
 
     @Value("${bot.chat}")
-    private String chatUrl;
+    private String chat;
 
     @Value("${bot.urlPayments}")
     private String urlPayments;
@@ -57,7 +57,7 @@ public class CallbackHandler {
     public SendMessage actionAndRef(Update update){
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
-        messageBuilder
+        SendMessage sendMessage = messageBuilder
                 .line()
                 .line("Акционер \uD83E\uDD1D Реферал\n" +
                         "\n" +
@@ -67,15 +67,15 @@ public class CallbackHandler {
                         "Мои акции Вы можете оставить сообщение для своих Рефералов, в котором можете указать свои контактные данные для более тесного сотрудничества с ними.\n" +
                         "\n" +
                         "Если же Вы являетесь Рефералом, то загляните в раздел \uD83C\uDFEB Биржа -" +
-                        " \uD83D\uDCBC Мой акционер, возможно Ваш Акционер оставил там для Вас сообщение и хочет помочь Вам в развитии \uD83C\uDFED Вашей компании.");
+                        " \uD83D\uDCBC Мой акционер, возможно Ваш Акционер оставил там для Вас сообщение и хочет помочь Вам в развитии \uD83C\uDFED Вашей компании.").build();
 
-        return messageBuilder.build();
+        return sendMessage;
     }
 
     public SendMessage advert(Update update){
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
-        messageBuilder
+       SendMessage sendMessage = messageBuilder
                 .line()
                 .line("\uD83D\uDCC6 РЕКЛАМА В БОТЕ \n" +
                         "\n" +
@@ -90,7 +90,7 @@ public class CallbackHandler {
                         "\n" +
                         "\uD83D\uDCDE Чат проекта:\n" +
                         "\n" +
-                        "@"+ chatUrl + "\n" +
+                        " \uD83C\uDDF7\uD83C\uDDFA<a href=\"" + chat + "\">Подписаться</a>\uD83C\uDDF7\uD83C\uDDFA\n" +
                         " \n" +
                         "\uD83D\uDCB5 Выплаты проекта:\n" +
                         "\n" +
@@ -98,24 +98,28 @@ public class CallbackHandler {
                         " \n" +
                         "\uD83D\uDCCA По рекламе: \uD83D\uDCCA\n" +
                         "\n" +
-                        "@" + adminUsername);
+                        "@" + adminUsername).build();
+        sendMessage.enableHtml(true);
+        sendMessage.disableWebPagePreview();
 
-        return messageBuilder.build();
+        return sendMessage;
     }
 
     public SendMessage chat(Update update){
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
-        messageBuilder
+       SendMessage sendMessage =  messageBuilder
                 .line()
                 .line("\uD83D\uDCAC Игровой ЧАТ\n" +
                         "\n" +
                         "Присоединяйтесь к официальному чату игрового сообщества CapitalistGame, чтобы получить помощь и консультацию, обсудить происходящее в игре, а так же чтобы найти соратников\uD83D\uDC65 и компаньонов\uD83E\uDD1D:  \n" +
-                        "\uD83D\uDCAC @"+ chatUrl +" \uD83D\uDCAC\n" +
+                                " \uD83C\uDDF7\uD83C\uDDFA<a href=\"" + chat + "\">Подписаться</a>\uD83C\uDDF7\uD83C\uDDFA\n" +
                         "\n" +
-                        "\uD83C\uDF81 Если Вы ранее не вступали в чат, Вы получите награду.");
+                        "\uD83C\uDF81 Если Вы ранее не вступали в чат, Вы получите награду.").build();
+        sendMessage.enableHtml(true);
+        sendMessage.disableWebPagePreview();
 
-        return messageBuilder.build();
+        return sendMessage;
     }
 
     public AnswerCallbackQuery creatAlertCallbackOil(Update update){

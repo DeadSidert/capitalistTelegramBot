@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -325,14 +324,17 @@ public class Addition {
     public SendMessage community(Update update) {
         int userId = update.getMessage().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
-        return messageBuilder
+        SendMessage sendMessage =  messageBuilder
                 .line("\uD83D\uDCAC Сообщество\n" +
                         "  \n" +
                         "Здесь Вы можете найти официальные чаты, посвященные проекту.\n" +
-                        " \uD83C\uDDF7\uD83C\uDDFA@" + chat + "\uD83C\uDDF7\uD83C\uDDFA\n" +
+                        " \uD83C\uDDF7\uD83C\uDDFA<a href=\"" + chat + "\">Подписаться</a>\uD83C\uDDF7\uD83C\uDDFA\n" +
                         " \n" +
                         "Если Вы ранее не вступали в чат, Вы получите награду.")
                 .build();
+        sendMessage.enableHtml(true);
+        sendMessage.disableWebPagePreview();
+        return sendMessage;
     }
 
     public SendMessage topRefs(Update update){
@@ -358,11 +360,7 @@ public class Addition {
                 .line("\uD83D\uDC65 ТОП по рефералам\n" +
                         "\n" +
                         " Перед Вами ТОП игроков по приглашению рефералов. \n" +
-                        " По истечении каждых двух недель, счёт обнуляется и все игроки, попавшие в \uD83D\uDD25ТОП\uD83D\uDD1F, получают награду!\n" +
-                        " \n" +
-                        "До конца конкурса осталось: \n" +
-                        between.toDays() +" д. \n" +
-                        "За этот конкурс Вы пригласили: "+ user.getCountReferals() +" чел.\n" +
+                        " Вы пригласили: "+ user.getCountReferals() +" чел.\n" +
                         " \n" +
                         "\uD83D\uDD25ТОП\uD83D\uDD1F участников:")
                 .line();

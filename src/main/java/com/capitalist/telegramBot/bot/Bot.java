@@ -280,7 +280,30 @@ public class Bot extends TelegramLongPollingBot {
                 executeWithExceptionCheck(sendMessage);
             }
         }
-
+        // удалить канал
+        else if ("Удалить канал".equalsIgnoreCase(command)){
+            if (user.getUserId() == Integer.parseInt(botAdmin) || user.getRole().equalsIgnoreCase("admin")){
+                executeWithExceptionCheck(admin.deleteChannel(update));
+            }
+            else{
+                sendMessage = MessageBuilder.create(user)
+                        .line("Вы не админ!")
+                        .build();
+                executeWithExceptionCheck(sendMessage);
+            }
+        }
+        // удалить канал
+        else if ("Добавить канал".equalsIgnoreCase(command)){
+            if (user.getUserId() == Integer.parseInt(botAdmin) || user.getRole().equalsIgnoreCase("admin")){
+                executeWithExceptionCheck(admin.addChannel(update));
+            }
+            else{
+                sendMessage = MessageBuilder.create(user)
+                        .line("Вы не админ!")
+                        .build();
+                executeWithExceptionCheck(sendMessage);
+            }
+        }
 
     }
     public void fabricCallbackTelegram(Update update){
@@ -289,6 +312,15 @@ public class Bot extends TelegramLongPollingBot {
         // выбор inline меню Акционер и реферал
         if ("/cancel".equalsIgnoreCase(callbackQuery.getData())){
             mainMenuCallback(update);
+        }
+        // выбор inline меню Акционер и реферал
+        if ("/cancelAdmin".equalsIgnoreCase(callbackQuery.getData())){
+           User user = userService.getOrCreate(update.getCallbackQuery().getFrom().getId());
+           MessageBuilder messageBuilder = MessageBuilder.create(user);
+           messageBuilder.line("Действие отменено");
+           user.setPositions("back");
+           userService.update(user);
+           executeWithExceptionCheck(messageBuilder.build());
         }
 
         // выбор inline меню Акционер и реферал
@@ -582,6 +614,12 @@ public class Bot extends TelegramLongPollingBot {
       }
         else if ("messageToAll".equalsIgnoreCase(position)){
             admin.messageToAllImpl(update).forEach(this::executeWithExceptionCheck);
+      }
+      else if("deleteChannel".equalsIgnoreCase(position)){
+          executeWithExceptionCheck(admin.deleteChannelImpl(update));
+      }
+      else if("addChannel".equalsIgnoreCase(position)){
+          executeWithExceptionCheck(admin.addChannelImpl(update));
       }
     }
 

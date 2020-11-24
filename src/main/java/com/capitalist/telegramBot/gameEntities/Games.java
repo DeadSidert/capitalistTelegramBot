@@ -39,8 +39,9 @@ public class Games {
         user.setOilCoin(user.getOilCoin() + oilCoin);
         user.setECoin(user.getECoin() + eCoin);
         userService.update(user);
+        List<Channel> channelList = channelService.findAll();
 
-        if (user.isJoined()){
+        if (user.isJoined() || channelList.isEmpty()){
             return messageBuilder
                     .line("\uD83C\uDF81 Ежедневный бонус\n" +
                             "   \n" +
