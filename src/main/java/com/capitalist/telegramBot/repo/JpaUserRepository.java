@@ -22,5 +22,15 @@ public interface JpaUserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE u.referId<>0")
     List<User> usersWithRefer();
 
+    @Query("select u from User u where u.name<>'Без названия'")
+    List<User> findUsersWithName();
 
+    @Query("select u from User u where u.oilProductTime <> 0")
+    List<User> findUsersByOilTime();
+
+    @Query("select u from User u where u.electricProductTime <> 0")
+    List<User> findUsersByElectricTime();
+
+    @Query("SELECT count(u) from User u where u.name=:name")
+    User findByName(@Param("name") String name);
 }

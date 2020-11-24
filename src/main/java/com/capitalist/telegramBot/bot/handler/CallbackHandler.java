@@ -124,7 +124,8 @@ public class CallbackHandler {
 
     public AnswerCallbackQuery creatAlertCallbackOil(Update update){
         String id = update.getCallbackQuery().getId();
-        int oil = market.getUserCompany((update.getCallbackQuery().getFrom().getId())).getOil();
+        int userId = update.getCallbackQuery().getFrom().getId();
+        int oil = userService.getOrCreate(userId).getOilProducted();
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
         answerCallbackQuery
                 .setCallbackQueryId(id);
@@ -137,7 +138,8 @@ public class CallbackHandler {
 
     public AnswerCallbackQuery creatAlertCallbackElectric(Update update){
         String id = update.getCallbackQuery().getId();
-        int electric = market.getUserCompany((update.getCallbackQuery().getFrom().getId())).getElectric();
+        int userId = update.getCallbackQuery().getFrom().getId();
+        int electric = userService.getOrCreate(userId).getElectricProducted();
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
         answerCallbackQuery.setCallbackQueryId(id);
         answerCallbackQuery.setShowAlert(true);

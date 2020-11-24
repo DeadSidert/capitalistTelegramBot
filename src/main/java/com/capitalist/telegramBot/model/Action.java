@@ -18,14 +18,11 @@ public class Action {
     private int actionsId;
     private String nameCompany;
     private int userId;
-    @Column(name = "company_id")
-    private int companyId;
     private int quantity;
     private String type;
 
     public Action() {
         this.quantity = 0;
-        this.companyId = 0;
         this.userId = 0;
         this.nameCompany = "";
         this.type = "user";

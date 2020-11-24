@@ -4,13 +4,10 @@ import com.capitalist.telegramBot.bot.builder.MessageBuilder;
 import com.capitalist.telegramBot.model.Channel;
 import com.capitalist.telegramBot.model.User;
 import com.capitalist.telegramBot.service.ChannelService;
-import com.capitalist.telegramBot.service.CompanyService;
 import com.capitalist.telegramBot.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.ChatMember;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.List;
@@ -58,7 +55,7 @@ public class Games {
                         oilCoin + " \uD83C\uDF11 OilCoin\n" +
                         eCoin + " \uD83C\uDF15 ECoin")
                 .row()
-                .button("Получить бонус за подписку", "/getBonusForJoin")
+                .button("Дополнительный бонус Х20 \uD83D\uDD25", "/getBonusForJoin")
                 .build();
     }
 

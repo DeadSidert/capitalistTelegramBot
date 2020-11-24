@@ -2,11 +2,10 @@ package com.capitalist.telegramBot.gameEntities;
 
 import com.capitalist.telegramBot.bot.builder.MessageBuilder;
 import com.capitalist.telegramBot.model.Action;
-import com.capitalist.telegramBot.model.Company;
 import com.capitalist.telegramBot.model.User;
 import com.capitalist.telegramBot.service.ActionsService;
-import com.capitalist.telegramBot.service.CompanyService;
 import com.capitalist.telegramBot.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -18,19 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class Actions {
 
     private final ActionsService actionsService;
     private final UserService userService;
-    private final CompanyService companyService;
     private final ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
 
-    @Autowired
-    public Actions(ActionsService actionsService, UserService userService, CompanyService companyService) {
-        this.actionsService = actionsService;
-        this.userService = userService;
-        this.companyService = companyService;
-    }
 
     public SendMessage action(Update update){
         int userId = update.getMessage().getFrom().getId();
@@ -79,18 +72,18 @@ public class Actions {
         User user = userService.getOrCreate(userId);
         MessageBuilder builder = MessageBuilder.create(String.valueOf(userId));
 
-        List<Company> companies = companyService.findCompaniesWithName();
+        List<User> users = userService.findByUsername();
 
-        if (companies.isEmpty()){
+        if (users.isEmpty()){
             return builder
                     .line("К сожалению, еще нет компаний, указавших название")
                     .build();
         }
 
-        int random = (int)(Math.random() * companies.size());
-        Company company = companies.get(random);
+        int random = (int)(Math.random() * users.size());
+        User user1 = users.get(random);
 
-        Action act = actionsService.findByUserIdAndCompany(userId, company.getCompanyId());
+        Action act = actionsService.findByUserIdAndName(user1.getUserId(), user1.getName());
 
         user.setBallsTwo(user.getBallsTwo() - price);
 
@@ -99,8 +92,7 @@ public class Actions {
             actionsService.update(act);
         } else {
             actions.setUserId(userId);
-            actions.setCompanyId(company.getCompanyId());
-            actions.setNameCompany(company.getName());
+            actions.setNameCompany(user.getName());
             actions.setQuantity(1);
 
             actionsService.update(actions);
@@ -108,7 +100,7 @@ public class Actions {
         }
         userService.update(user);
         return builder
-                .line("Вы купили акцию компании " + company.getName())
+                .line("Вы купили акцию компании " + user.getName())
                 .build();
     }
 
@@ -157,22 +149,25 @@ public class Actions {
         String name = update.getMessage().getText();
         MessageBuilder builder = MessageBuilder.create(String.valueOf(userId));
 
-        List<Company> companies = companyService.getCompanies();
-        for (Company company : companies){
-            if (company.getName().equalsIgnoreCase(name)){
-                User user = userService.getOrCreate(userId);
-                user.setPositions("back");
-                userService.update(user);
+        User usr = userService.getOrCreate(userId);
+        usr.setPositions("back");
+        userService.update(usr);
+
+        List<User> companies = userService.findByUsername();
+        for (User user : companies){
+            if (user.getName().equalsIgnoreCase(name)){
                 return builder
                         .line("Информация о компании\n")
-                        .line("Название: " + company.getName())
+                        .line("Название: " + user.getName())
                         .line()
-                        .line("Нефти на складе: " + company.getOil())
+                        .line("Нефти на складе: " + user.getOilProducted())
                         .line()
-                        .line("Энергии на складе: "+ company.getElectric())
+                        .line("Энергии на складе: "+ user.getElectricProducted())
                         .build();
             }
         }
+
+
         return builder
                 .line("Такой компании не существует")
                 .row()
@@ -214,20 +209,18 @@ public class Actions {
                             "Баланс: " + user.getBallsTwo() + ", а необходимо 15 \uD83D\uDD37 балл")
                     .build();
         }
-        Company company = companyService.getOrCreate(user.getCompanyId());
         Action actions = new Action();
 
         user.setBallsTwo(user.getBallsTwo() - price);
 
-        Action act = actionsService.findByUserIdAndCompany(userId, company.getCompanyId());
+        Action act = actionsService.findByUserIdAndName(userId, user.getName());
 
         if (act != null){
             act.setQuantity(act.getQuantity()+1);
             actionsService.update(act);
         } else {
             actions.setUserId(userId);
-            actions.setCompanyId(company.getCompanyId());
-            actions.setNameCompany(company.getName());
+            actions.setNameCompany(user.getName());
             actions.setQuantity(1);
 
             actionsService.update(actions);

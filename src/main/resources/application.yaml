@@ -1,7 +1,7 @@
 bot:
-  token:
+  token: 1392424435:AAFWlQHWheZY26S6xCMNXtRyN0E_7-8V6h8
   name: Monopoly
-  admin:
+  admin: 1046320877
   url: https://t.me/MonopolyGameBot
   chat: https://t.me/joinchat/Pl2W7RlQSBCGbHeft5xEBw
   urlStat: tgstat
@@ -24,7 +24,7 @@ spring:
   datasource:
     #  Note that the hostname, port and database name on url property and username and password properties will be ignored
     #  and it will be used default container values
-    url: jdbc:postgresql://localhost:5432/telega5?user=nikita&password=91823God&currentSchema=public
+    url: jdbc:postgresql://localhost:5432/telega7?user=nikita&password=91823God&currentSchema=public
     driver-class-name: org.postgresql.Driver
     username: nikita
     password: 91823God

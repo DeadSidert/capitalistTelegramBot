@@ -1,5 +1,6 @@
 CREATE TABLE usr (
                      user_id integer NOT NULL,
+                     name varchar,
                      oil_coin integer,
                      gold integer,
                      e_coin integer,
@@ -9,7 +10,6 @@ CREATE TABLE usr (
                      positions varchar,
                      balls_1 decimal,
                      balls_2 decimal,
-                     company_id integer,
                      refer_id integer,
                      reg_date varchar,
                      task_completed integer,
@@ -17,6 +17,10 @@ CREATE TABLE usr (
                      daily_bonus boolean,
                      count_referals integer,
                      joined boolean,
+                     oil_producted integer,
+                     electric_producted integer,
+                     oil_product_time integer,
+                     electric_product_time integer,
                      CONSTRAINT pk_user PRIMARY KEY (user_id)
 );
 
@@ -44,17 +48,6 @@ CREATE TABLE actions (
                          quantity integer,
                          type varchar,
                          CONSTRAINT pk_actions PRIMARY KEY (actions_id)
-);
-
-CREATE TABLE company (
-                               company_id serial NOT NULL,
-                               oil integer,
-                               electric integer,
-                               oil_product integer,
-                               electric_product integer,
-                               name varchar,
-                               user_percent integer,
-                               CONSTRAINT pk_company PRIMARY KEY (company_id)
 );
 
 CREATE TABLE oil_pump (

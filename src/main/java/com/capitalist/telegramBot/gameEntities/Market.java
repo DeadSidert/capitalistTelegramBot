@@ -1,32 +1,24 @@
 package com.capitalist.telegramBot.gameEntities;
 
 import com.capitalist.telegramBot.bot.builder.MessageBuilder;
-import com.capitalist.telegramBot.model.Company;
 import com.capitalist.telegramBot.model.User;
-import com.capitalist.telegramBot.service.CompanyService;
 import com.capitalist.telegramBot.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Component
+@RequiredArgsConstructor
 public class Market {
 
     private final UserService userService;
-    private final CompanyService companyService;
-
-    @Autowired
-    public Market(UserService userService, CompanyService companyService) {
-        this.userService = userService;
-        this.companyService = companyService;
-    }
 
     public SendMessage mark(Update update){
         int userId = update.getMessage().getFrom().getId();
-        Company company = getUserCompany(userId);
 
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        User user = userService.getOrCreate(userId);
         messageBuilder
                 .line()
                 .line("\uD83D\uDED2 Рынок\n" +
@@ -35,8 +27,8 @@ public class Market {
                         "Здесь Вы можете продать ресурсы со склада.\n" +
                         "\n" +
                         "\uD83D\uDCE6 На складе:\n" +
-                        company.getOil() + " \uD83D\uDEE2 баррелей нефти\n" +
-                        company.getElectric() + " \uD83D\uDD0B киловатт энергии\n" +
+                        user.getOilProducted() + " \uD83D\uDEE2 баррелей нефти\n" +
+                        user.getElectricProducted() + " \uD83D\uDD0B киловатт энергии\n" +
                         "\n" +
                         "Расценки продажи:\n" +
                         "500 баррелей нефти = 1 \uD83D\uDCB0 Gold и 2 \uD83C\uDF11 OilCoin.\n" +
@@ -52,7 +44,6 @@ public class Market {
 
     public SendMessage sellOil(Update update) {
         int userId = update.getCallbackQuery().getFrom().getId();
-        Company company = getUserCompany(userId);
         User user = userService.getOrCreate(userId);
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
 
@@ -82,10 +73,9 @@ public class Market {
                     .build();
         }
 
-        Company company = getUserCompany(userId);
         User user = userService.getOrCreate(userId);
 
-        if (company.getOil() < quantity){
+        if (user.getOilProducted() < quantity){
             return messageBuilder
                     .line("Недостаточно нефти на складе!")
                     .build();
@@ -93,8 +83,8 @@ public class Market {
 
         gold = quantity / 500;
         oilCoin = quantity / 250;
-        company.setOil(company.getOil() - quantity);
-        companyService.update(company);
+        user.setOilProducted(user.getOilProducted() - quantity);
+        userService.update(user);
 
         user.setPositions("back");
         user.setGold(user.getGold() + gold);
@@ -109,7 +99,6 @@ public class Market {
 
     public SendMessage sellElectric(Update update) {
         int userId = update.getCallbackQuery().getFrom().getId();
-        Company company = getUserCompany(userId);
         User user = userService.getOrCreate(userId);
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
 
@@ -140,10 +129,9 @@ public class Market {
                     .build();
         }
 
-        Company company = getUserCompany(userId);
         User user = userService.getOrCreate(userId);
 
-        if (company.getElectric() < quantity){
+        if (user.getElectricProducted() < quantity){
             return messageBuilder
                     .line("Недостаточно энергии на складе!")
                     .build();
@@ -151,8 +139,8 @@ public class Market {
 
         eCrypt = quantity / 500;
         eCoin = quantity / 250;
-        company.setElectric(company.getElectric() - quantity);
-        companyService.update(company);
+        user.setElectricProducted(user.getElectricProducted() - quantity);
+        userService.update(user);
 
         user.setECrypt(user.getECrypt() + eCrypt);
         user.setECoin(user.getECoin() + eCoin);
@@ -167,18 +155,13 @@ public class Market {
 
 
     public boolean enoughOil(int id){
-        Company company = getUserCompany(id);
-        return company.getOil() >=500;
+        User user = userService.getOrCreate(id);
+        return user.getOilProducted() >=500;
     }
 
     public boolean enoughElectric(int id){
-        Company company = getUserCompany(id);
-        return company.getElectric() >=500;
-    }
-
-    public Company getUserCompany(int id){
         User user = userService.getOrCreate(id);
-        return companyService.getOrCreate(user.getCompanyId());
+        return user.getElectricProducted() >=500;
     }
 
 

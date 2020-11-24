@@ -47,7 +47,6 @@ public class Bot extends TelegramLongPollingBot {
     private final OilPumpService oilPumpService;
     private final PowerhouseService powerhouseService;
     private final ActionsService actionsService;
-    private final CompanyService companyService;
     private final MyCompany myCompany;
     private final Admin admin;
     private final ChannelService channelService;
@@ -82,32 +81,6 @@ public class Bot extends TelegramLongPollingBot {
         // проверка позиции
         if (!"back".equalsIgnoreCase(user.getPositions())){
             fabricPosition(update, user.getPositions());
-        }
-
-        if (command.split(" ").length > 1){
-            String[] c = command.split(" ");
-            if (c[0].equalsIgnoreCase("/start") && user.getReferId() == 0){
-                int referId = 0;
-                try {
-                    referId = Integer.parseInt(c[1]);
-                }catch (Exception e){
-                    log.error("Неправильно введен id рефера");
-                }
-                user.setReferId(Integer.parseInt(c[1]));
-                User refer = userService.getOrCreate(referId);
-                refer.setOilCoin(user.getOilCoin() + 40);
-                refer.setECoin(user.getECoin() + 20);
-                refer.setCountReferals(user.getCountReferals()+1);
-
-                userService.update(user);
-                userService.update(refer);
-                sendMessage = updateReceiver.start(update);
-                executeWithExceptionCheck(sendMessage);
-
-                MessageBuilder messageBuilder = MessageBuilder.create(refer);
-                messageBuilder.line("У вас новый реферал! Вы получили бонус :)");
-                executeWithExceptionCheck(messageBuilder.build());
-            }
         }
 
         // старт
@@ -302,6 +275,32 @@ public class Bot extends TelegramLongPollingBot {
                         .line("Вы не админ!")
                         .build();
                 executeWithExceptionCheck(sendMessage);
+            }
+        }
+        // проверка на рефералку
+        if (command.split(" ").length > 1){
+            String[] c = command.split(" ");
+            if (c[0].equalsIgnoreCase("/start") && user.getReferId() == 0){
+                int referId = 0;
+                try {
+                    referId = Integer.parseInt(c[1]);
+                }catch (Exception e){
+                    log.error("Неправильно введен id рефера");
+                }
+                user.setReferId(Integer.parseInt(c[1]));
+                User refer = userService.getOrCreate(referId);
+                refer.setOilCoin(user.getOilCoin() + 40);
+                refer.setECoin(user.getECoin() + 20);
+                refer.setCountReferals(user.getCountReferals()+1);
+
+                userService.update(user);
+                userService.update(refer);
+                sendMessage = updateReceiver.start(update);
+                executeWithExceptionCheck(sendMessage);
+
+                MessageBuilder messageBuilder = MessageBuilder.create(refer);
+                messageBuilder.line("У вас новый реферал! Вы получили бонус :)");
+                executeWithExceptionCheck(messageBuilder.build());
             }
         }
 
@@ -707,14 +706,16 @@ public class Bot extends TelegramLongPollingBot {
     // каждый час работы электростанций и нефтяных установок
     @Scheduled(fixedDelay = 3600000)
     public void executeEveryTimeTask(){
+
         List<Powerhouse> powerhouses = powerhouseService.findAllUsersPower();
         List<OilPump> oilPumps = oilPumpService.findAllByUsersOil();
 
-        powerhouses.forEach(powerhouse -> powerhouse.setProducted(powerhouse.getProducted() + (powerhouse.getProduction()/100)*30));
-        oilPumps.forEach(oilPump -> oilPump.setProducted(oilPump.getProducted() + (oilPump.getProduction()/100)*70));
+        powerhouses.forEach(e -> e.setProducted(e.getProducted() + e.getProduction()));
+        oilPumps.forEach(e -> e.setProducted(e.getProducted() + e.getProduction()));
 
-        powerhouses.forEach(powerhouseService::save);
         oilPumps.forEach(oilPumpService::save);
+        powerhouses.forEach(powerhouseService::save);
+
     }
 
     // обновление ежедневного бонуса
@@ -737,15 +738,14 @@ public class Bot extends TelegramLongPollingBot {
         for (User u : users){
             int percent = 30;
             User refer = userService.getOrCreate(u.getReferId());
-            int oilCoin = 0;
-            int eCoin = 0;
-            Company company = companyService.getOrCreate(refer.getCompanyId());
+            int oil = 0;
+            int electric = 0;
 
-            eCoin = company.getElectricProduct();
-            oilCoin = company.getOilProduct();
+            electric = u.getElectricProductTime();
+            oil = u.getOilProductTime();
 
-            refer.setECoin(refer.getECoin() + (eCoin/100)*percent);
-            refer.setOilCoin(refer.getOilCoin() + oilCoin);
+            refer.setElectricProducted(refer.getECoin() + (electric/100)*percent);
+            refer.setOilProducted(refer.getOilCoin() + (oil/100)*percent);
             userService.update(refer);
         }
     }
@@ -756,19 +756,19 @@ public class Bot extends TelegramLongPollingBot {
         List<Action> actions = actionsService.findAll();
         for (Action action : actions){
             User actioner = userService.getOrCreate(action.getUserId());
-            Company company = companyService.getOrCreate(action.getCompanyId());
+            User company = userService.findByName(action.getNameCompany());
             int quantity = action.getQuantity();
 
-            int oilCoin = ((company.getOilProduct()/100)*30)*quantity;
-            int eCoin =   ((company.getElectricProduct()/100)*30)*quantity;
+            int oil = ((company.getOilProductTime()/100)*30)*quantity;
+            int electric =   ((company.getElectricProductTime()/100)*30)*quantity;
 
-            actioner.setOilCoin(actioner.getOilCoin() + oilCoin);
-            actioner.setECoin(actioner.getECoin() + eCoin);
+            actioner.setOilProducted(actioner.getOilCoin() + oil);
+            actioner.setElectricProducted(actioner.getECoin() + electric);
 
             userService.update(actioner);
             MessageBuilder messageBuilder = MessageBuilder.create(actioner);
             SendMessage sendMessage = messageBuilder.line("Вы получили с акции компании " + company.getName() +
-                    " OilCoin: " + oilCoin + " и ECoin: " + eCoin).build();
+                    "\n \uD83D\uDEE2 нефти: " + oil + " и \uD83D\uDD0B энергии: " + electric).build();
             executeWithExceptionCheck(sendMessage);
         }
     }

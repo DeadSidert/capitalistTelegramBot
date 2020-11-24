@@ -26,16 +26,12 @@ public class ActionsService {
         return actionsRepository.findByUserId(id);
     }
 
-    public Action findByUserIdAndCompany(int id, int companyId){
-        return actionsRepository.findByUserIdAndCompany(id, companyId);
+    public Action findByUserIdAndName(int id, String name){
+        return actionsRepository.findByUserIdAndName(id, name);
     }
 
     public List<Action> findAll(){
         return actionsRepository.findAll();
-    }
-
-    public List<Action> findByCompany(int id){
-        return actionsRepository.findByCompanyName(id);
     }
 
 }

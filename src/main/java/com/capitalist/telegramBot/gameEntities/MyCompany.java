@@ -18,7 +18,6 @@ import java.util.List;
 public class MyCompany {
 
     private final UserService userService;
-    private final CompanyService companyService;
     private final OilPumpService oilPumpService;
     private final PowerhouseService powerhouseService;
     private final ActionsService actionsService;
@@ -71,15 +70,6 @@ public class MyCompany {
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.get(userId).get();
 
-        if (user.getCompanyId() == 0){
-            Company company = new Company();
-            companyService.update(company);
-            user.setCompanyId(company.getCompanyId());
-            userService.update(user);
-        }
-
-        Company company = companyService.getOrCreate(user.getCompanyId());
-
         messageBuilder
                 .line()
                 .line("⛽️ Нефтяные насосы\n" +
@@ -111,7 +101,7 @@ public class MyCompany {
                         "Количество: "+ levelCount( 6, userId) +"\n" +
                         "Добыто: "+ productCount(6, userId) +" \uD83D\uDEE2 баррелей нефти\n" +
                         "\n" +
-                        "\uD83D\uDCE6 Баррелей нефти на складе: "+ company.getOil() +"\n" +
+                        "\uD83D\uDCE6 Баррелей нефти на складе: "+ user.getOilProducted() +"\n" +
                         "\n" +
                         "Вы отдаете 30% всей добываемой Вами нефти акционеру.");
 
@@ -131,13 +121,6 @@ public class MyCompany {
         int userId = update.getMessage().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.get(userId).get();
-
-        if (user.getCompanyId() == 0){
-            Company company = new Company();
-            companyService.update(company);
-            user.setCompanyId(company.getCompanyId());
-            userService.update(user);
-        }
 
         messageBuilder
                 .line()
@@ -170,7 +153,7 @@ public class MyCompany {
                         "Количество: "+ levelCountElectric( 6, userId) +"\n" +
                         "Добыто: "+ productCountElectric(6, userId) +" \uD83D\uDD0B киловатт энергии\n" +
                         "\n" +
-                        "\uD83D\uDCE6 Киловатт энергии в аккумуляторах на складе: 0\n" +
+                        "\uD83D\uDCE6 Киловатт энергии в аккумуляторах на складе: "+user.getElectricProducted()+"\n" +
                         "  \n" +
                         "Вы отдаете 30% всей добываемой Вами киловатт энергии акционеру.");
 
@@ -273,9 +256,8 @@ public class MyCompany {
         user.setOilCoin(user.getOilCoin() - oilPump.getPrice());
         userService.update(user);
 
-        Company company = companyService.getOrCreate(user.getCompanyId());
-        company.setOilProduct(company.getOilProduct() + oilPump.getProduction());
-        companyService.update(company);
+        user.setOilProductTime(user.getOilProductTime() + oilPump.getProduction());
+        userService.update(user);
 
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         messageBuilder
@@ -303,9 +285,8 @@ public class MyCompany {
         user.setECoin(user.getECoin() - powerhouse.getPrice());
         userService.update(user);
 
-        Company company = companyService.getOrCreate(user.getCompanyId());
-        company.setElectricProduct(company.getElectricProduct() + powerhouse.getProduction());
-        companyService.update(company);
+        user.setElectricProductTime(user.getElectricProductTime() + powerhouse.getProduction());
+        userService.update(user);
 
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         messageBuilder
@@ -363,7 +344,6 @@ public class MyCompany {
                             "У вас " + user.getECoin())
                     .build();
         }
-        Company company = companyService.getOrCreate(user.getCompanyId());
 
         for (int i = 0; i < quantity; i++) {
             Powerhouse powerhouse = new Powerhouse();
@@ -373,12 +353,12 @@ public class MyCompany {
             powerhouse.setUserId(userId);
             powerhouse.setLevel(level);
             powerhouseService.save(powerhouse);
-            company.setElectricProduct(company.getElectricProduct() + powerhouse.getProduction());
+            user.setElectricProductTime(user.getElectricProductTime() + powerhouse.getProduction());
         }
 
         user.setPositions("back");
         userService.update(user);
-        companyService.update(company);
+        userService.update(user);
 
         return messageBuilder
                 .line()
@@ -403,7 +383,6 @@ public class MyCompany {
                             "У вас " + user.getECoin())
                     .build();
         }
-        Company company = companyService.getOrCreate(user.getCompanyId());
 
         for (int i = 0; i < quantity; i++) {
             OilPump oilPump = new OilPump();
@@ -413,12 +392,12 @@ public class MyCompany {
             oilPump.setUserId(userId);
             oilPump.setLevel(level);
             oilPumpService.save(oilPump);
-            company.setOilProduct(company.getOilProduct() + oilPump.getProduction());
+            user.setOilProductTime(user.getOilProductTime() + oilPump.getProduction());
         }
 
         user.setPositions("back");
         userService.update(user);
-        companyService.update(company);
+        userService.update(user);
 
         return messageBuilder
                 .line()
@@ -431,23 +410,19 @@ public class MyCompany {
         int userId = update.getMessage().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.get(userId).get();
-        Company company = companyService.getOrCreate(user.getCompanyId());
 
-        List<OilPump> oilPumps = oilPumpService.findByUserId(userId);
-        List<Powerhouse> powerhouses = powerhouseService.findByUserId(userId);
+        int sumProductionOil = user.getOilProductTime();
+        int sumProductionPower = user.getElectricProductTime();
 
-        int sumProductionOil = oilPumps.stream().mapToInt(OilPump::getProduction).sum();
-        int sumProductionPower = powerhouses.stream().mapToInt(Powerhouse::getProduction).sum();
-
-        int sumProductedOil = oilPumps.stream().mapToInt(OilPump::getProducted).sum();
-        int sumProductedPower = powerhouses.stream().mapToInt(Powerhouse::getProducted).sum();
+        int sumProductedOil = user.getOilProducted();
+        int sumProductedPower = user.getElectricProducted();
 
         messageBuilder
                 .line()
                 .line("\uD83D\uDCCA Статистика Вашей компании\n" +
                         "  \n" +
                         "\uD83D\uDCDD Название Вашей компании:\n" +
-                        " '" + company.getName() + "'\n" +
+                        " '" + user.getName() + "'\n" +
                         "\n" +
                         "\uD83D\uDCC5 Компания зарегистрирована:\n" +
                         " " + user.getRegDate() + "\n" +
@@ -456,10 +431,10 @@ public class MyCompany {
                         sumProductionOil +" \uD83D\uDEE2 баррелей в час\n" +
                         sumProductionPower + " \uD83D\uDD0B киловатт энергии в час\n" +
                         " \n" +
-                        "\uD83D\uDEE2 Всего было добыто баррелей нефти:\n" +
+                        "\uD83D\uDEE2 На складе баррелей нефти:\n" +
                         " "+ sumProductedOil +"\n" +
                         "\n" +
-                        "\uD83D\uDD0B Всего было выработано киловатт энергии:\n" +
+                        "\uD83D\uDD0B На складе киловатт энергии:\n" +
                         " "+ sumProductedPower +"\n" +
                         "\n" +
                         "\uD83D\uDC64 Компаний, зарегистрировавшихся по Вашей реферальной ссылке:\n" +
@@ -505,7 +480,6 @@ public class MyCompany {
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.get(userId).get();
-        Company company = companyService.getOrCreate(user.getCompanyId());
         int oil = 0;
 
         List<OilPump> oilPumps = oilPumpService.findByUserId(userId);
@@ -527,8 +501,8 @@ public class MyCompany {
                     .line("У вас нет нефти, которую можно было бы собрать")
                     .build();
         }else {
-            company.setOil(oil);
-            companyService.update(company);
+            user.setOilProducted(user.getOilProducted() + oil);
+            userService.update(user);
         }
         return messageBuilder
                 .line("Собрано нефти: " + oil)
@@ -539,7 +513,6 @@ public class MyCompany {
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.get(userId).get();
-        Company company = companyService.getOrCreate(user.getCompanyId());
         int electric = 0;
 
         List<Powerhouse> powerhouses = powerhouseService.findByUserId(userId);
@@ -561,8 +534,8 @@ public class MyCompany {
                     .line("У вас нет энергии, которую можно было бы собрать")
                     .build();
         }else {
-            company.setElectric(electric);
-            companyService.update(company);
+            user.setElectricProducted(user.getElectricProducted() + electric);
+            userService.update(user);
         }
         return messageBuilder
                 .line("Собрано энергии: " + electric)
@@ -604,10 +577,9 @@ public class MyCompany {
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.getOrCreate(userId);
-        Company company = companyService.getOrCreate(user.getCompanyId());
         List<SendMessage> messages = new ArrayList<>();
 
-            if (company.getName().equalsIgnoreCase("Без названия")) {
+            if (user.getName().equalsIgnoreCase("Без названия")) {
                 messages.add(messageBuilder.line("Вы не указали название боту").build());
                 return messages;
             }
@@ -700,9 +672,8 @@ public class MyCompany {
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.getOrCreate(userId);
         List<SendMessage> messages = new ArrayList<>();
-        Company company = companyService.getOrCreate(user.getCompanyId());
 
-        if (company.getOil() == 0){
+        if (user.getOilProducted() != 0){
             messages.add(messageBuilder.line("Вы не собрали ресурсы на склад!").build());
             return messages;
         }

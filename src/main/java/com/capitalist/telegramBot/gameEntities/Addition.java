@@ -1,10 +1,9 @@
 package com.capitalist.telegramBot.gameEntities;
 
 import com.capitalist.telegramBot.bot.builder.MessageBuilder;
-import com.capitalist.telegramBot.model.Company;
 import com.capitalist.telegramBot.model.User;
-import com.capitalist.telegramBot.service.CompanyService;
 import com.capitalist.telegramBot.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -22,10 +21,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
+@RequiredArgsConstructor
 public class Addition {
 
     private final UserService userService;
-    private final CompanyService companyService;
     private final ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
 
     @Value("${bot.admin}")
@@ -33,11 +32,6 @@ public class Addition {
 
     @Value("${bot.chat}")
     private String chat;
-
-    public Addition(UserService userService, CompanyService companyService) {
-        this.userService = userService;
-        this.companyService = companyService;
-    }
 
     public SendMessage add(Update update){
         int userId = update.getMessage().getFrom().getId();
@@ -118,7 +112,6 @@ public class Addition {
 
 
         User user = userService.getOrCreate(userId);
-        Company company = companyService.getOrCreate(user.getCompanyId());
         if (checkName(name)){
             return messageBuilder
                     .line("Введено неправильно имя!")
@@ -129,10 +122,10 @@ public class Addition {
 
         user.setPositions("back");
         userService.update(user);
-        company.setName(name);
-        companyService.update(company);
+        user.setName(name);
+        userService.update(user);
         return messageBuilder
-                .line("Теперь имя вашей компании: " + company.getName())
+                .line("Теперь имя вашей компании: " + user.getName())
                 .build();
     }
 
@@ -370,9 +363,8 @@ public class Addition {
                 return messageBuilder
                         .build();
             }
-            Company company = companyService.getOrCreate(users.get(i).getCompanyId());
             messageBuilder
-                   .line(arr[i] + company.getName() + " - пригласил " + users.get(i).getCountReferals() + " чел.");
+                   .line(arr[i] + user.getName() + " - пригласил " + users.get(i).getCountReferals() + " чел.");
         }
         return messageBuilder
                 .build();

@@ -24,13 +24,17 @@ public class User {
     private Integer gold;
     private Integer eCoin;
     private Integer eCrypt;
-    private Integer companyId;
     private Integer referId;
     private Integer countReferals;
     private String regDate;
     private Integer taskCompleted;
     private String qiwi;
     private Boolean dailyBonus;
+    private String name;
+    private int oilProductTime;
+    private int electricProductTime;
+    private int oilProducted;
+    private int electricProducted;
 
     @Column(name = "references_url")
     private String referencesUrl;
@@ -59,12 +63,16 @@ public class User {
         this.positions = "back";
         this.ballsOne = 0.000;
         this.ballsTwo = 0.000;
-        this.companyId = 0;
         this.taskCompleted = 0;
         this.regDate = new SimpleDateFormat("dd.MM.yyyy").format(new Date());
         this.qiwi = "";
         this.dailyBonus = false;
         this.countReferals = 0;
         this.joined = false;
+        this.name = "Без названия";
+        this.electricProducted = 0;
+        this.oilProducted = 0;
+        this.oilProductTime = 0;
+        this.electricProductTime = 0;
     }
 }

@@ -5,8 +5,8 @@ import com.capitalist.telegramBot.model.Payment;
 import com.capitalist.telegramBot.model.User;
 import com.capitalist.telegramBot.service.PaymentService;
 import com.capitalist.telegramBot.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.math3.util.Precision;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -18,17 +18,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class Bank {
 
     private final UserService userService;
     private final PaymentService paymentService;
     private final ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
-
-    @Autowired
-    public Bank(UserService userService, PaymentService paymentService) {
-        this.userService = userService;
-        this.paymentService = paymentService;
-    }
 
     public SendMessage pay(Update update) {
         int userId = update.getMessage().getFrom().getId();
