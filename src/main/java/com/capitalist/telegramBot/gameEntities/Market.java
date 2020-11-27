@@ -7,12 +7,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class Market {
 
     private final UserService userService;
+    private final ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
 
     public SendMessage mark(Update update){
         int userId = update.getMessage().getFrom().getId();
@@ -50,11 +56,13 @@ public class Market {
         user.setPositions("sell_oil");
         userService.update(user);
 
-        return messageBuilder
+        createCancelMenu();
+
+        SendMessage sendMessage =  messageBuilder
                 .line("Введите кол-во \uD83D\uDEE2 баррелей нефти для продажи")
-                .row()
-                .button("Отмена", "/cancel")
                 .build();
+        sendMessage.setReplyMarkup(keyboard);
+        return sendMessage;
     }
      // ввести кол-во нефти для продажи
     public SendMessage sellOilImpl(Update update) {
@@ -63,6 +71,11 @@ public class Market {
         int quantity = 0;
         int gold = 0;
         int oilCoin = 0;
+        User user = userService.getOrCreate(userId);
+
+        if ("back".equalsIgnoreCase(user.getPositions())){
+            return new SendMessage();
+        }
 
         try {
             quantity = Integer.parseInt(update.getMessage().getText());
@@ -72,8 +85,6 @@ public class Market {
                     .line("Вы ввели не число")
                     .build();
         }
-
-        User user = userService.getOrCreate(userId);
 
         if (user.getOilProducted() < quantity){
             return messageBuilder
@@ -104,12 +115,13 @@ public class Market {
 
         user.setPositions("sell_electric");
         userService.update(user);
+        createCancelMenu();
 
-        return messageBuilder
+        SendMessage sendMessage =  messageBuilder
                 .line("Введите кол-во \uD83D\uDD0B киловатт энергии")
-                .row()
-                .button("Отмена", "/cancel")
                 .build();
+        sendMessage.setReplyMarkup(keyboard);
+        return sendMessage;
     }
 
     // ввести кол-во энергии для продажи
@@ -119,6 +131,11 @@ public class Market {
         int quantity = 0;
         int eCrypt = 0;
         int eCoin = 0;
+        User user = userService.getOrCreate(userId);
+
+        if ("back".equalsIgnoreCase(user.getPositions())){
+            return new SendMessage();
+        }
 
         try {
             quantity = Integer.parseInt(update.getMessage().getText());
@@ -128,8 +145,6 @@ public class Market {
                     .line("Вы ввели не число")
                     .build();
         }
-
-        User user = userService.getOrCreate(userId);
 
         if (user.getElectricProducted() < quantity){
             return messageBuilder
@@ -165,4 +180,14 @@ public class Market {
     }
 
 
+    public void createCancelMenu(){
+        List<KeyboardRow> rowList = new ArrayList<>();
+
+        KeyboardRow keyboardRow2 = new KeyboardRow();
+        keyboardRow2.add("⬅️ Назад");
+
+        rowList.add(keyboardRow2);
+        keyboard.setResizeKeyboard(true);
+        keyboard.setKeyboard(rowList);
+    }
 }

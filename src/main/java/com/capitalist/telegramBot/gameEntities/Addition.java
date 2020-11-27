@@ -68,6 +68,17 @@ public class Addition {
         keyboard.setKeyboard(rowList);
     }
 
+    public void createCancelMenu(){
+        List<KeyboardRow> rowList = new ArrayList<>();
+
+        KeyboardRow keyboardRow2 = new KeyboardRow();
+        keyboardRow2.add("⬅️ Назад");
+
+        rowList.add(keyboardRow2);
+        keyboard.setResizeKeyboard(true);
+        keyboard.setKeyboard(rowList);
+    }
+
     public SendMessage addName(Update update){
         int userId = update.getMessage().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
@@ -96,13 +107,18 @@ public class Addition {
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         User user = userService.getOrCreate(userId);
 
+        createCancelMenu();
+
         user.setPositions("change_name");
         userService.update(user);
-        return messageBuilder
+        SendMessage sendMessage = messageBuilder
                 .line("\uD83D\uDCDD Изменить название\n" +
                         "  \n" +
                         "Введите название для Вашей компании.")
                 .build();
+
+        sendMessage.setReplyMarkup(keyboard);
+        return sendMessage;
     }
 
     public SendMessage changeNameImpl(Update update){
@@ -110,13 +126,15 @@ public class Addition {
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
         String name = update.getMessage().getText();
 
-
         User user = userService.getOrCreate(userId);
+
+        if ("back".equalsIgnoreCase(user.getPositions())){
+            return new SendMessage();
+        }
+
         if (checkName(name)){
             return messageBuilder
                     .line("Введено неправильно имя!")
-                    .row()
-                    .button("Отмена", "/cancel")
                     .build();
         }
 
@@ -124,9 +142,11 @@ public class Addition {
         userService.update(user);
         user.setName(name);
         userService.update(user);
-        return messageBuilder
+        SendMessage sendMessage = messageBuilder
                 .line("Теперь имя вашей компании: " + user.getName())
                 .build();
+        sendMessage.setReplyMarkup(keyboard);
+        return sendMessage;
     }
 
     public SendMessage help(Update update){

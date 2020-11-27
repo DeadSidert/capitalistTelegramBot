@@ -78,6 +78,11 @@ public class Bot extends TelegramLongPollingBot {
         String command = update.getMessage().getText();
         User user = userService.getOrCreate(update.getMessage().getFrom().getId());
 
+        // нажатие на Назад в меню
+        if ("⬅️ Назад".equalsIgnoreCase(command) || "✖️ Отмена".equalsIgnoreCase(command)){
+            mainMenu(update);
+        }
+
         // проверка позиции
         if (!"back".equalsIgnoreCase(user.getPositions())){
             fabricPosition(update, user.getPositions());
@@ -168,10 +173,6 @@ public class Bot extends TelegramLongPollingBot {
         else if ("\uD83C\uDFED Моя компания".equalsIgnoreCase(command)){
             sendMessage = updateReceiver.mainCompany(update);
             executeWithExceptionCheck(sendMessage);
-        }
-        // нажатие на Назад в меню
-        else if ("⬅️ Назад".equalsIgnoreCase(command) || "✖️ Отмена".equalsIgnoreCase(command)){
-            mainMenu(update);
         }
         // нажатие на Рынок в меню
         else if ("\uD83D\uDED2 Рынок".equalsIgnoreCase(command)){
