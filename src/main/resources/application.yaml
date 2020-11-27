@@ -1,7 +1,7 @@
 bot:
-  token:
+  token: 1392424435:AAFWlQHWheZY26S6xCMNXtRyN0E_7-8V6h8
   name: Monopoly
-  admin:
+  admin: 1046320877
   url: https://t.me/MonopolyGameBot
   chat: https://t.me/joinchat/Pl2W7RlQSBCGbHeft5xEBw
   urlStat: tgstat
