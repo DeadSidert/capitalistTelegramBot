@@ -744,8 +744,8 @@ public class Bot extends TelegramLongPollingBot {
             electric = u.getElectricProductTime();
             oil = u.getOilProductTime();
 
-            refer.setElectricProducted(refer.getECoin() + (electric/100)*percent);
-            refer.setOilProducted(refer.getOilCoin() + (oil/100)*percent);
+            refer.setElectricProducted(refer.getElectricProducted() + (electric/100)*percent);
+            refer.setOilProducted(refer.getOilProducted() + (oil/100)*percent);
             userService.update(refer);
         }
     }

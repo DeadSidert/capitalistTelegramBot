@@ -1,12 +1,13 @@
 bot:
-  token: 1392424435:AAFWlQHWheZY26S6xCMNXtRyN0E_7-8V6h8
+  token:
   name: Monopoly
-  admin: 1046320877
+  admin:
   url: https://t.me/MonopolyGameBot
   chat: https://t.me/joinchat/Pl2W7RlQSBCGbHeft5xEBw
   urlStat: tgstat
   urlPayments: payments
   adminUsername: fry55
+  number: +79045050656
 
 server:
   port: 8072

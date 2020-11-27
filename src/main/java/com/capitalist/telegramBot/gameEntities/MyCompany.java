@@ -673,7 +673,7 @@ public class MyCompany {
         User user = userService.getOrCreate(userId);
         List<SendMessage> messages = new ArrayList<>();
 
-        if (user.getOilProducted() != 0){
+        if (user.getOilProducted() == 0){
             messages.add(messageBuilder.line("Вы не собрали ресурсы на склад!").build());
             return messages;
         }

@@ -6,6 +6,8 @@ import com.capitalist.telegramBot.model.User;
 import com.capitalist.telegramBot.service.PaymentService;
 import com.capitalist.telegramBot.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.math3.util.Precision;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -24,6 +26,9 @@ public class Bank {
     private final UserService userService;
     private final PaymentService paymentService;
     private final ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
+
+    int merchantId = 0; // id магазина
+    String type = ""; // тип валюты
 
     public SendMessage pay(Update update) {
         int userId = update.getMessage().getFrom().getId();
@@ -80,6 +85,7 @@ public class Bank {
     public SendMessage paymentOilCoin(Update update) {
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+        type = "oilcoin";
 
         messageBuilder
                 .line("\uD83D\uDCB8 Покупка \uD83C\uDF11 OilCoin\n" +
@@ -92,19 +98,26 @@ public class Bank {
                         "2️⃣ Выберите нужное количество \uD83C\uDF11OilCoin, которое вы хотите приобрести:")
                 .line()
                 .row()
-                .buttonWithUrl("100 \uD83C\uDF11 OilCoin", "/buy_oilCoin100", "")
+                .buttonWithUrl("100 \uD83C\uDF11 OilCoin", "/buy_oilCoin100", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+100+"&o="+userId+"&s="+getMd5(100, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("200 \uD83C\uDF11 OilCoin", "/buy_oilCoin200", "")
+                .buttonWithUrl("200 \uD83C\uDF11 OilCoin", "/buy_oilCoin200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+200+"&o="+userId+"&s="+getMd5(200, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("400 \uD83C\uDF11 OilCoin", "/buy_oilCoin400", "")
+                .buttonWithUrl("400 \uD83C\uDF11 OilCoin", "/buy_oilCoin400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+400+"&o="+userId+"&s="+getMd5(400, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("800 \uD83C\uDF11 OilCoin", "/buy_oilCoin800", "")
+                .buttonWithUrl("800 \uD83C\uDF11 OilCoin", "/buy_oilCoin800", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+800+"&o="+userId+"&s="+getMd5(800, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("1600 \uD83C\uDF11 OilCoin", "/buy_oilCoin1600", "")
+                .buttonWithUrl("1600 \uD83C\uDF11 OilCoin", "/buy_oilCoin1600", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+1600+"&o="+userId+"&s="+getMd5(1600, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("3200 \uD83C\uDF11 OilCoin", "/buy_oilCoin3200", "")
+                .buttonWithUrl("3200 \uD83C\uDF11 OilCoin", "/buy_oilCoin3200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+3200+"&o="+userId+"&s="+getMd5(3200, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("6400 \uD83C\uDF11 OilCoin", "/buy_oilCoin6400", "");
+                .buttonWithUrl("6400 \uD83C\uDF11 OilCoin", "/buy_oilCoin6400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+6400+"&o="+userId+"&s="+getMd5(6400, userId)+"&lang=ru&us_type="+type);
 
         return messageBuilder.build();
     }
@@ -112,6 +125,8 @@ public class Bank {
     public SendMessage paymentECoin(Update update) {
         int userId = update.getCallbackQuery().getFrom().getId();
         MessageBuilder messageBuilder = MessageBuilder.create(String.valueOf(userId));
+
+        type = "ecoin";
 
         messageBuilder
                 .line("\uD83D\uDCB8 Покупка \uD83C\uDF15 ECoin\n" +
@@ -124,21 +139,36 @@ public class Bank {
                         "2️⃣ Выберите нужное количество \uD83C\uDF15 ECoin, которое вы хотите приобрести:")
                 .line()
                 .row()
-                .buttonWithUrl("100 \uD83C\uDF15 ECoin", "/buy_eCoin100", "")
+                .buttonWithUrl("100 \uD83C\uDF15 ECoin", "/buy_eCoin100", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+100+"&o="+userId+"&s="+getMd5(100, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("200 \uD83C\uDF15 ECoin", "/buy_eCoin200", "")
+                .buttonWithUrl("200 \uD83C\uDF15 ECoin", "/buy_eCoin200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+200+"&o="+userId+"&s="+getMd5(200, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("400 \uD83C\uDF15 ECoin", "/buy_eCoin400", "")
+                .buttonWithUrl("400 \uD83C\uDF15 ECoin", "/buy_eCoin400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+400+"&o="+userId+"&s="+getMd5(400, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("800 \uD83C\uDF15 ECoin", "/buy_eCoin800", "")
+                .buttonWithUrl("800 \uD83C\uDF15 ECoin", "/buy_eCoin800", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+800+"&o="+userId+"&s="+getMd5(800, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("1600 \uD83C\uDF15 ECoin", "/buy_eCoin1600", "")
+                .buttonWithUrl("1600 \uD83C\uDF15 ECoin", "/buy_eCoin1600", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+1600+"&o="+userId+"&s="+getMd5(1600, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("3200 \uD83C\uDF15 ECoin", "/buy_eCoin3200", "")
+                .buttonWithUrl("3200 \uD83C\uDF15 ECoin", "/buy_eCoin3200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+3200+"&o="+userId+"&s="+getMd5(3200, userId)+"&lang=ru&us_type="+type)
                 .row()
-                .buttonWithUrl("6400 \uD83C\uDF15 ECoin", "/buy_eCoin6400", "");
+                .buttonWithUrl("6400 \uD83C\uDF15 ECoin", "/buy_eCoin6400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
+                        "&oa="+6400+"&o="+userId+"&s="+getMd5(6400, userId)+"&lang=ru&us_type="+type);
 
         return messageBuilder.build();
+    }
+
+    // обработка подписи freeKassa
+    @SneakyThrows
+    private String getMd5(int sum, int userId){
+        String secretWord = "";
+        String label = merchantId + ":" + sum +":" + secretWord + ":" + userId;
+        return DigestUtils.md5Hex(label);
     }
 
     public SendMessage change(Update update) {
