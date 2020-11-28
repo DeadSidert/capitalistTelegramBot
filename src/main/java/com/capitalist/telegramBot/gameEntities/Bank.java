@@ -99,25 +99,25 @@ public class Bank {
                 .line()
                 .row()
                 .buttonWithUrl("100 \uD83C\uDF11 OilCoin", "/buy_oilCoin100", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+100+"&o="+userId+"&s="+getMd5(100, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+100+"&o="+userId+"&s="+getMd5(100, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("200 \uD83C\uDF11 OilCoin", "/buy_oilCoin200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+200+"&o="+userId+"&s="+getMd5(200, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+200+"&o="+userId+"&s="+getMd5(200, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("400 \uD83C\uDF11 OilCoin", "/buy_oilCoin400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+400+"&o="+userId+"&s="+getMd5(400, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+400+"&o="+userId+"&s="+getMd5(400, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("800 \uD83C\uDF11 OilCoin", "/buy_oilCoin800", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+800+"&o="+userId+"&s="+getMd5(800, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+800+"&o="+userId+"&s="+getMd5(800, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("1600 \uD83C\uDF11 OilCoin", "/buy_oilCoin1600", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+1600+"&o="+userId+"&s="+getMd5(1600, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+1600+"&o="+userId+"&s="+getMd5(1600, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("3200 \uD83C\uDF11 OilCoin", "/buy_oilCoin3200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+3200+"&o="+userId+"&s="+getMd5(3200, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+3200+"&o="+userId+"&s="+getMd5(3200, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("6400 \uD83C\uDF11 OilCoin", "/buy_oilCoin6400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+6400+"&o="+userId+"&s="+getMd5(6400, userId)+"&lang=ru&us_type="+type);
+                        "&oa="+6400+"&o="+userId+"&s="+getMd5(6400, userId)+"&lang=ru&us_type="+type+"&type=json");
 
         return messageBuilder.build();
     }
@@ -140,25 +140,25 @@ public class Bank {
                 .line()
                 .row()
                 .buttonWithUrl("100 \uD83C\uDF15 ECoin", "/buy_eCoin100", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+100+"&o="+userId+"&s="+getMd5(100, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+100+"&o="+userId+"&s="+getMd5(100, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("200 \uD83C\uDF15 ECoin", "/buy_eCoin200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+200+"&o="+userId+"&s="+getMd5(200, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+200+"&o="+userId+"&s="+getMd5(200, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("400 \uD83C\uDF15 ECoin", "/buy_eCoin400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+400+"&o="+userId+"&s="+getMd5(400, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+400+"&o="+userId+"&s="+getMd5(400, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("800 \uD83C\uDF15 ECoin", "/buy_eCoin800", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+800+"&o="+userId+"&s="+getMd5(800, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+800+"&o="+userId+"&s="+getMd5(800, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("1600 \uD83C\uDF15 ECoin", "/buy_eCoin1600", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+1600+"&o="+userId+"&s="+getMd5(1600, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+1600+"&o="+userId+"&s="+getMd5(1600, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("3200 \uD83C\uDF15 ECoin", "/buy_eCoin3200", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+3200+"&o="+userId+"&s="+getMd5(3200, userId)+"&lang=ru&us_type="+type)
+                        "&oa="+3200+"&o="+userId+"&s="+getMd5(3200, userId)+"&lang=ru&us_type="+type+"&type=json")
                 .row()
                 .buttonWithUrl("6400 \uD83C\uDF15 ECoin", "/buy_eCoin6400", "https://www.free-kassa.ru/merchant/cash.php?m="+merchantId+
-                        "&oa="+6400+"&o="+userId+"&s="+getMd5(6400, userId)+"&lang=ru&us_type="+type);
+                        "&oa="+6400+"&o="+userId+"&s="+getMd5(6400, userId)+"&lang=ru&us_type="+type+"&type=json");
 
         return messageBuilder.build();
     }
